@@ -1,0 +1,7 @@
+.*.sw?
+/.pytest_cache
+/.tox
+/.eggs
+*.egg-info
+__pycache__
+geckodriver.log
