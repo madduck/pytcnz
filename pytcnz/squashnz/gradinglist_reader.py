@@ -151,6 +151,7 @@ class GradingListReader(DataSource):
                         continue
                     elif points_max and player["points"] > points_max:
                         continue
+                    player["club"] = club["desc"]
                     yield player
 
     def read_players(
@@ -170,7 +171,7 @@ class GradingListReader(DataSource):
 
         colmap = colmap or {}
         colmap["squashcode"] = colmap.get("squashcode", "squash_code")
-        colnames = ("id", "name", "gender", "squashCode", "grade", "points")
+        colnames = ("id", "name", "gender", "squashCode", "grade", "points", "club")
         records = []
         for player in self.__get_all_player_dicts(
             name=name,
