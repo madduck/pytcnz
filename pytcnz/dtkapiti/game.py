@@ -115,15 +115,17 @@ class Game(BaseGame):
 
             try:
                 scores, unparsed = Scores.from_string(data["comment"])
-                data["comment"] = unparsed
+                if scores:
+                    data["comment"] = unparsed
 
-                if (scores.winner == Scores.Player.A and score2) or (
-                    scores.winner == Scores.Player.B and score1
-                ):
-                    r = "-".join(map(str, (score1, score2)))
-                    raise Game.InconsistentResultError(
-                        f"Scores don't match result {r}: {scores}"
-                    )
+                    if (scores.winner == Scores.Player.A and score2) or (
+                        scores.winner == Scores.Player.B and score1
+                    ):
+                        r = "-".join(map(str, (score1, score2)))
+                        raise Game.InconsistentResultError(
+                            f"Scores don't match result {r}: {scores}"
+                        )
+
             except Scores.BaseException as e:
                 raise Game.ReadError(
                     f"While reading scores for game {name}: {e}"

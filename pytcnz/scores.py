@@ -46,12 +46,18 @@ class Scores:
             except ValueError:
                 unp.append(s)
 
-        return ret, SET_DELIMS[0].join(unp)
+        if ret:
+            return ret, SET_DELIMS[0].join(unp)
+        else:
+            return None, string
 
     @classmethod
     def from_string(cls, string, *, bestof=5, par=(11, 15)):
         scores, remainder = cls.__parse_string(string)
-        return cls(scores, bestof=bestof, par=par), remainder
+        if scores:
+            return cls(scores, bestof=bestof, par=par), remainder
+        else:
+            return None, remainder
 
     def __init__(self, sets=None, *, bestof=5, par=(11, 15)):
         try:
@@ -65,7 +71,7 @@ class Scores:
         except TypeError:
             par = par or (11, 15)  # noqa:E701
 
-        self._sets = sets
+        self._sets = sets or []
         self._bestof = bestof
         self._par = par
         self._winner = None

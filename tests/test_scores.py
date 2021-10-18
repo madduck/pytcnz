@@ -191,20 +191,26 @@ def test_from_string(valid_string):
     Scores.from_string(valid_string)
 
 
+@pytest.fixture(
+    params=[
+        "",
+        "No scores, just a comment",
+    ]
+)
+def no_scores_string(request):
+    return request.param
+
+
+def test_from_string_no_scores(no_scores_string):
+    scores, remainder = Scores.from_string(no_scores_string)
+    assert scores is None
+    assert remainder == no_scores_string
+
+
 def test_from_string_with_comment():
     c = "The Quick Brown Fox Jumped Over The Lazy Dog"
     s, comment = Scores.from_string(f"11-0 11-0 11-0 {c}")
     assert c == comment
-
-
-def test_from_empty_string():
-    with pytest.raises(Scores.IncompleteError):
-        Scores.from_string("")
-
-
-def test_from_comment_string():
-    with pytest.raises(Scores.IncompleteError):
-        Scores.from_string("The Quick Brown Fox Jumped Over The Lazy Dog")
 
 
 @pytest.fixture(params=VALID_PAR11 + VALID_PAR15)
