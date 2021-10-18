@@ -4,6 +4,8 @@ The `pytcnz` library provides abstractions for various data types relevant to Sq
 
 In addition to abstractions, the library provides access to various data sources, and even a remote controller for iSquash.
 
+Have a look at the [scripts of tctools](https://github.com/madduck/tctools/tree/main/scripts), as well as [tc2web](https://github.com/madduck/tctools/tree/main/tc2web) for inspiration.
+
 ## Abstractions
 
 The following abstractions are provided:
@@ -44,7 +46,7 @@ game = Game('M0101', player1='Martin', player2='John', datetime='Thu 8:00pm',
 print(f'{game.name} was won by {game.get_winner()} in {game.scores.sets} sets')
 ```
 
-# Data sources
+## Data sources
 
 Instances of the above abstractions can be created using a number of different data sources. Please keep in mind that not every data source provides the same data set. This is largely why there are different types of Players/Draws/Games in different contexts.
 
@@ -75,15 +77,13 @@ for player in data.players.values():
     print(f'{player.name} from {player.club} has {player.points:,d} points')
 ```
 
-# iSquash Controller
+## iSquash Controller
 
 Finally, pytcnz can make use of [Selenium](https://www.selenium.dev/) to control iSquash, so you don't have to do that manually. In combination with the data sources above, the following functionality is currently possible:
 
 * Make and seed draws as created in the DrawMaker spreadsheet, optionally registering players who aren't yet registered (because they come from the waiting list);
 * Bulk-register players matching certain criteria to the waiting list, such that their data becomes available in the DrawMaker;
 * Record the scores for played games, and update iSquash diagrams, as well as publish results to the grading list.
-
-Have a look at the [scripts of tctools](https://github.com/madduck/tctools/tree/main/scripts), as well as [tc2web](https://github.com/madduck/tctools/tree/main/tc2web) for inspiration.
 
 # Contributing
 
