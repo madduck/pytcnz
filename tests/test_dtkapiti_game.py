@@ -107,25 +107,30 @@ def test_inconsistent_scores_disagree(played_game_data):
         Game(**played_game_data | dict(status=0, score1=0, score2=1))
 
 
+def test_no_datetime_sort(game_data):
+    unscheduled = Game(**game_data | dict(daytime=None))
+    assert Game(**game_data | dict(daytime='Fri 18:00')) < unscheduled
+
+
 def test_sort_order_days(game_data):
     assert Game(**game_data) < Game(**game_data | dict(daytime='Fri 18:00'))
+
+
+def test_no_datetime_is_none(game_data):
+    assert Game(**game_data | dict(daytime=None)).datetime is None
 
 
 def test_sort_order_same_time(game_data):
     assert not (Game(**game_data) < Game(**game_data))
 
 
-def test_game_day_sort_no_date_no_reverse(game_data):
-    gd1 = Game(
-        **game_data | dict(name="W0101", datetime="", reverse_name_sort=False)
-    )
-    gd2 = Game(
-        **game_data | dict(name="W1101", datetime="", reverse_name_sort=False)
-    )
+def test_game_day_sort_no_date(game_data):
+    gd1 = Game(**game_data | dict(name="W0101", daytime=""))
+    gd2 = Game(**game_data | dict(name="W1101", daytime=""))
     assert gd1 < gd2
 
 
-def test_game_day_sort_no_date_reverse(game_data):
-    gd1 = Game(**game_data | dict(name="W0101", datetime=""))
-    gd2 = Game(**game_data | dict(name="W1101", datetime=""))
-    assert not (gd1 < gd2)
+def test_game_day_sort_same_time_reverse(game_data):
+    final = Game(**game_data | dict(name="W0301", daytime="Sat 18:00"))
+    plate = Game(**game_data | dict(name="W0303", daytime="Sat 18:00"))
+    assert plate < final

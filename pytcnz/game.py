@@ -22,15 +22,7 @@ class Game(DataRecord):
         return self.name
 
     def __lt__(self, other):
-        if self.get("reverse_name_sort", True) and other.get(
-            "reverse_name_sort", True
-        ):
-            # The "better" games usually have a lower number, e.g. M0301 is
-            # the final, and M0304 is the consolation plate, and the "better"
-            # games are generally later, so sort them in reverse order
-            return other.name.__lt__(self.name)
-        else:
-            return self.name.__lt__(other.name)
+        return self.name.__lt__(other.name)
 
     def __hash__(self):
         return hash(self.name)

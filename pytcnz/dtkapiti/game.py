@@ -130,6 +130,7 @@ class Game(BaseGame):
                 )
 
         data["scores"] = scores
+        data["datetime"] = None
 
         datetime = data.get("daytime")
         if datetime:
@@ -146,7 +147,7 @@ class Game(BaseGame):
                         "tournament_start_date", dateutil.parser.parse("Mon")
                     ),
                 )
-            del data['daytime']
+            del data["daytime"]
 
         super().__init__(name=name, player1=player1, player2=player2, **data)
 
@@ -160,13 +161,28 @@ class Game(BaseGame):
         return f"{s})>"
 
     def __lt__(self, other):
-        try:
-            if self.datetime != other.datetime:
-                return self.datetime.__lt__(other.datetime)
-        except AttributeError:
-            pass
 
-        return super().__lt__(other)
+        s, o = self.get('datetime'), other.get('datetime')
+
+        if s is None and o is None:
+            # Sort as if we didn't have datetime
+            return super().__lt__(other)
+        elif s is None:
+            # Unscheduled games always sort after scheduled games:
+            return False
+        elif o is None:
+            # Scheduled games always sort before unscheduled games:
+            return True
+        elif s != o:
+            # Earlier games sort before later games
+            return self.datetime.__lt__(other.datetime)
+
+        # Now we're in the situation where two games are scheduled at the
+        # same time, which is special, because now we actually want to
+        # reverse the sort order so that the "better" games with the lower
+        # number show up later, e.g. W0301 is the final, W0304 the consolation
+        # plate…
+        return BaseGame.__lt__(other, self)
 
     def is_scheduled(self):
         return self.get("datetime") is not None and not self.is_played()
@@ -212,6 +228,7 @@ if __name__ == "__main__":
     print(repr(g3))
     try:
         import ipdb
+
         ipdb.set_trace()
     except ImportError:
         pass

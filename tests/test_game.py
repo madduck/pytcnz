@@ -54,7 +54,5 @@ def test_unknown_player(game_data):
     assert not g.is_player_known(Scores.Player.A)
 
 
-def test_sort_order(game_data):
-    g1 = game_data.copy()
-    g1["name"] = "M0101"
-    assert Game(**game_data) < Game(**g1)
+def test_sort_order(game_data, game):
+    assert Game(**game_data | dict(name="M0101")) < game
