@@ -472,7 +472,7 @@ class iSquashController:
                     By.XPATH, "//*[@id='drawForm']/table/tbody/tr"
                 )
 
-                draw = row.find_element(By.XPATH, f".//td[1]").text
+                draw = row.find_element(By.XPATH, ".//td[1]").text
                 if draws and draw not in draws:
                     continue
                 button = row.find_element(
@@ -542,11 +542,13 @@ class iSquashController:
         ).click()
         self.state = self.State.seeding
 
-        self.driver.execute_script("""
+        self.driver.execute_script(
+            """
             els = document.getElementsByTagName('select');
             for (let i = 0; i < els.length; ++i) {
                 els[i].setAttribute('onchange', '');
-            }"""
+            }
+            """
         )
 
         for i, player in enumerate(draw.players):

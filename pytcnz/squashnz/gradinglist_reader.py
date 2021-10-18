@@ -171,7 +171,15 @@ class GradingListReader(DataSource):
 
         colmap = colmap or {}
         colmap["squashcode"] = colmap.get("squashcode", "squash_code")
-        colnames = ("id", "name", "gender", "squashCode", "grade", "points", "club")
+        colnames = (
+            "id",
+            "name",
+            "gender",
+            "squashCode",
+            "grade",
+            "points",
+            "club",
+        )
         records = []
         for player in self.__get_all_player_dicts(
             name=name,
