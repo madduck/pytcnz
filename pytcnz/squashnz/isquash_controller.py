@@ -42,9 +42,10 @@ class iSquashController:
         logged_in = 1
         pre_tournament = 2
         registering = 5
+        tseeding = 6
         managing = 10
         add_draw = 15
-        seeding = 16
+        dseeding = 16
         matches = 17
         results = 90
 
@@ -464,6 +465,23 @@ class iSquashController:
 
         self.state = self.State.managing
 
+    def go_seed_tournament(self):
+        self.go_pre_tournament()
+
+        self.driver.find_element(
+            By.XPATH, "//input[@value='Seed Tournament']"
+        ).click()
+        self.state = self.State.tseeding
+
+        self.driver.find_element(
+            By.XPATH,
+            "//*[@id='seedTournamentForm']//input[@value='Seed Tournament']",
+        ).click()
+
+        wait = WebDriverWait(self.driver, 10)
+        wait.until(expected_conditions.alert_is_present())
+        self.driver.switch_to.alert.accept()
+
     def go_delete_draws(self, draws=None, *, draw_cb=None):
         self.go_design_tournament()
 
@@ -541,7 +559,7 @@ class iSquashController:
             f"//*[@id='drawForm']/table/tbody/tr[{rowx}]"
             "/td[4]/input[@value='Seed Draw']",
         ).click()
-        self.state = self.State.seeding
+        self.state = self.State.dseeding
 
         self.driver.execute_script(
             """
