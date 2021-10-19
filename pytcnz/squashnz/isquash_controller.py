@@ -20,6 +20,7 @@ import sys
 import re
 import bdb
 import argparse
+import requests
 
 DRAW_TYPES = {
     "8": "Draw8",
@@ -481,6 +482,40 @@ class iSquashController:
         wait = WebDriverWait(self.driver, 10)
         wait.until(expected_conditions.alert_is_present())
         self.driver.switch_to.alert.accept()
+
+    def _go_extract_spreadsheet(self, filename, btndict):
+        self.go_design_tournament()
+
+        form = self.driver.find_element(By.ID, "toolbarForm")
+
+        viewstate = self.driver.find_element(
+            By.ID, "j_id1:javax.faces.ViewState:0"
+        )
+        jsessionid = self.driver.get_cookie("JSESSIONID")
+        response = requests.post(
+            urljoin(self.driver.current_url, form.get_attribute("action")),
+            data=btndict
+            | {
+                "toolbarForm": "toolbarForm",
+                "javax.faces.ViewState": viewstate.get_attribute("value"),
+            },
+            headers={"Referer": self.driver.current_url},
+            cookies={"JSESSIONID": jsessionid["value"]},
+        )
+        with open(filename, "wb") as f:
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+
+    def go_extract_registrations(self, filename):
+        self._go_extract_spreadsheet(
+            filename, {"toolbarForm:j_idt145": "Extract Registrations"}
+        )
+
+    def go_extract_draws(self, filename):
+        self._go_extract_spreadsheet(
+            filename, {"toolbarForm:j_idt147": "Extract Draws"}
+        )
 
     def go_delete_draws(self, draws=None, *, draw_cb=None):
         self.go_design_tournament()
