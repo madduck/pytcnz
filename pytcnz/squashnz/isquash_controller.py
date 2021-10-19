@@ -87,15 +87,16 @@ class iSquashController:
         self.__debug = debug
 
     def __repr__(self):
-        r = f"<{self.__class__.__name__}(state={self.state.name}"
+        mxlen = max(len(k) for k in iSquashController.State.__members__.keys())
+        r = f"<{self.__class__.__name__}(state={self.state.name:{mxlen+1}s}"
 
         if self.state >= self.State.logged_in:
-            r = f"{r} user={self.username}"
+            r = f"{r}user={self.username} "
 
         if self.state >= self.State.pre_tournament:
-            r = f"{r} tcode={self.tcode}"
+            r = f"{r}tcode={self.tcode} "
 
-        return f"{r})>"
+        return f"{r.strip()})>"
 
     def __enter__(self):
         return self
