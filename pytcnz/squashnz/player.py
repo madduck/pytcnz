@@ -155,6 +155,7 @@ if __name__ == "__main__":
     print(repr(player2))
     try:
         import ipdb
+
         ipdb.set_trace()
     except ImportError:
         pass

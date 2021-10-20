@@ -304,9 +304,7 @@ class iSquashController:
         except NoSuchElementException:
             pass
 
-    def go_fill_registrations(
-        self, players, *, update=False, sleep=None, player_cb=None
-    ):
+    def go_fill_registrations(self, players, *, update=False, player_cb=None):
         self.go_pre_tournament()
 
         self.driver.find_element(
