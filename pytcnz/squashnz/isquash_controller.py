@@ -270,10 +270,11 @@ class iSquashController:
         ).click()
 
         try:
+            i = 2
             while True:
                 row = self.driver.find_element(
                     By.XPATH,
-                    "//*[@id='listRegistrantsForm']" "/table/tbody/tr[2]",
+                    f"//*[@id='listRegistrantsForm']/table/tbody/tr[{i}]",
                 )
 
                 player = row.find_element(By.XPATH, ".//td[2]").text
@@ -287,6 +288,7 @@ class iSquashController:
                             removed=False,
                             msg="Player is assigned to a draw",
                         )
+                    i += 1
                     continue
 
                 button.click()
@@ -516,13 +518,15 @@ class iSquashController:
         self.go_design_tournament()
 
         try:
+            i = 1
             while True:
                 row = self.driver.find_element(
-                    By.XPATH, "//*[@id='drawForm']/table/tbody/tr"
+                    By.XPATH, f"//*[@id='drawForm']/table/tbody/tr[{i}]"
                 )
 
                 draw = row.find_element(By.XPATH, ".//td[1]").text
                 if draws and draw not in draws:
+                    i += 1
                     continue
                 button = row.find_element(
                     By.XPATH, ".//input[@value='Delete']"
