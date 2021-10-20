@@ -13,7 +13,6 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from urllib.parse import urljoin
-import time
 import enum
 import bs4
 import sys
@@ -339,16 +338,12 @@ class iSquashController:
                 self.driver.find_element(
                     By.ID, "makeTournamentRegistration:" "enterTournament"
                 ).click()
-                if sleep:
-                    time.sleep(sleep)
 
             if player_cb:
                 player_cb(player, False)
 
         for player in to_register:
             self.go_register_player(player, player_cb=player_cb)
-            if sleep:
-                time.sleep(sleep)
 
     def go_register_player(self, player, *, player_cb=None):
         if (
