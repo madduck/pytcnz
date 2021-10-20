@@ -117,19 +117,22 @@ class Player(PlayerBase):
     SALUTATIONS = ("Mr", "Mrs", "Ms", "Miss", "Dr")
 
     @classmethod
-    def get_first_name(cls, name, *, ignore_salutations=None):
+    def get_name_cleaned(cls, name, *, ignore_salutations=None):
         ignore_salutations = ignore_salutations or cls.SALUTATIONS
-        pat = (
-            rf"^(?:(?:{'|'.join(ignore_salutations)})\.?\s*)*"
-            r"(?P<fname>\S+).+"
-        )
-        match = re.match(pat, name)
-        try:
-            return match["fname"]
-        except IndexError:
+        pat = rf"^(?:(?:{'|'.join(ignore_salutations)})\.?\s*)*"
+        name = re.sub(pat, "", name)
+        return re.sub(r"(\w\.\s)*", "", name)
+
+    @classmethod
+    def get_first_name(cls, name, *, ignore_salutations=None):
+        parts = cls.get_name_cleaned(
+            name, ignore_salutations=ignore_salutations
+        ).split()
+        if len(parts) <= 1:
             raise Player.NameParseError(
                 f"Failed to determine first name of {name}"
             )
+        return parts[0]
 
 
 if __name__ == "__main__":

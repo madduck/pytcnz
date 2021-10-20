@@ -83,6 +83,27 @@ def test_player_relaxed_invalid_phonenumber(player_data):
 
 @pytest.fixture(
     params=[
+        ("Mrs. Jane Doe", "Jane Doe"),
+        ("Ms. Jane Doe", "Jane Doe"),
+        ("Miss Carry-Ann Doe", "Carry-Ann Doe"),
+        ("Dr. John Doe", "John Doe"),
+        ("John A. Doe", "John Doe"),
+        ("John Alfred Doe", "John Alfred Doe"),
+    ]
+)
+def name_and_cleaned_name(request):
+    return request.param
+
+
+def test_name_cleaning(name_and_cleaned_name):
+    assert (
+        Player.get_name_cleaned(name_and_cleaned_name[0])
+        == name_and_cleaned_name[1]
+    )
+
+
+@pytest.fixture(
+    params=[
         ("Jane Doe", "Jane"),
         ("Ms. Jane Doe", "Jane"),
         ("Carry-Ann Doe", "Carry-Ann"),
