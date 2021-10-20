@@ -95,7 +95,7 @@ def name_and_firstname(request):
     return request.param
 
 
-def test_first_name_extraction(player_data, name_and_firstname):
-    player_data["name"] = name_and_firstname[0]
-    p = Player(**player_data)
-    assert p.first_name == name_and_firstname[1]
+def test_first_name_extraction(name_and_firstname):
+    assert (
+        Player.get_first_name(name_and_firstname[0]) == name_and_firstname[1]
+    )
