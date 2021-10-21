@@ -70,7 +70,8 @@ class TCExportReader(DataSource):
                 )
 
             def postprocess(p):
-                self.__add_player_to_draw(p)
+                if p.draw.name:
+                    self.__add_player_to_draw(p)
 
         colmap = colmap or {}
         colmap |= dict(code="id")
