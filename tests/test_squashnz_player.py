@@ -87,8 +87,10 @@ def test_player_relaxed_invalid_phonenumber(player_data):
         ("Ms. Jane Doe", "Jane Doe"),
         ("Miss Carry-Ann Doe", "Carry-Ann Doe"),
         ("Dr. John Doe", "John Doe"),
+        ("Mr. John Doe", "John Doe"),
         ("John A. Doe", "John Doe"),
         ("John Alfred Doe", "John Alfred Doe"),
+        ("Mrs Jane Doe", "Jane Doe"),
     ]
 )
 def name_and_cleaned_name(request):

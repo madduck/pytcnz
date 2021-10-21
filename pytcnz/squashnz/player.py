@@ -118,7 +118,10 @@ class Player(PlayerBase):
 
     @classmethod
     def get_name_cleaned(cls, name, *, ignore_salutations=None):
-        ignore_salutations = ignore_salutations or cls.SALUTATIONS
+        ignore_salutations = sorted(
+            ignore_salutations or cls.SALUTATIONS,
+            key=lambda x: -len(x)
+        )
         pat = rf"^(?:(?:{'|'.join(ignore_salutations)})\.?\s*)*"
         name = re.sub(pat, "", name)
         return re.sub(r"(\w\.\s)*", "", name)
