@@ -41,6 +41,7 @@ class Player(PlayerBase):
     ):
         data = kwargs.copy()
 
+        name = Player.get_name_cleaned(name)
         first_name = Player.get_first_name(name)
         age_group = Player.AgeGroup.Unknown
         age = None
