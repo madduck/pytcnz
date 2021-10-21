@@ -64,6 +64,9 @@ class Draw(BaseDraw):
     def get_players(self):
         return self.players
 
+    def get_size(self):
+        return len(self.players)
+
     def add_game(self, game):
         if not game.name.startswith(self.name):
             raise Draw.InvalidGameError(

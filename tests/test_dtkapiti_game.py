@@ -134,3 +134,17 @@ def test_game_day_sort_same_time_reverse(game_data):
     final = Game(**game_data | dict(name="W0301", daytime="Sat 18:00"))
     plate = Game(**game_data | dict(name="W0303", daytime="Sat 18:00"))
     assert plate < final
+
+
+def test_fancy_game_name_round1(game):
+    assert game.get_fancy_name() == game.name
+
+
+def test_fancy_game_name_round3_no_drawsize(game_data):
+    final = Game(**game_data | dict(name="W0301"))
+    assert final.get_fancy_name() == final.name
+
+
+def test_fancy_game_name_round3_8draw(game_data):
+    final = Game(**game_data | dict(name="W0301"))
+    assert final.get_fancy_name(drawsize=8) == "Championship Final"

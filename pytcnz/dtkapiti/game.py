@@ -5,6 +5,7 @@
 #
 
 from ..game import Game as BaseGame
+from ..squashnz.game_names import get_game_name
 from ..datarecord import Placeholder
 from ..exceptions import BaseException
 from ..scores import Scores
@@ -164,7 +165,7 @@ class Game(BaseGame):
 
     def __lt__(self, other):
 
-        s, o = self.get('datetime'), other.get('datetime')
+        s, o = self.get("datetime"), other.get("datetime")
 
         if s is None and o is None:
             # Sort as if we didn't have datetime
@@ -185,6 +186,17 @@ class Game(BaseGame):
         # number show up later, e.g. W0301 is the final, W0304 the consolation
         # plate…
         return BaseGame.__lt__(other, self)
+
+    def get_fancy_name(self, *, drawsize=None, short=False):
+        try:
+            return get_game_name(
+                drawsize=drawsize or self.draw.get_size(),
+                gamecode=self.name.replace(self.draw.name, ""),
+                short=short,
+            )
+
+        except AttributeError:
+            return self.name
 
     def is_scheduled(self):
         return self.get("datetime") is not None and not self.is_played()
@@ -223,11 +235,15 @@ if __name__ == "__main__":
     print(repr(g2))
     print()
     gd.update(
-        comment="11-0 11-4 11-3", status=Game.Status.played, player1="Jane"
+        name="W0301",
+        comment="11-0 11-4 11-3",
+        status=Game.Status.played,
+        player1="Jane",
     )
     g3 = Game(**gd)
     print(vars(g3))
     print(repr(g3))
+    print(g3.get_fancy_name(drawsize=8))
     try:
         import ipdb
 
