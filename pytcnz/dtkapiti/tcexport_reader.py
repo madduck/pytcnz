@@ -23,6 +23,7 @@ class TCExportReader(DataSource):
         *,
         add_players_to_draws=False,
         add_games_to_draws=False,
+        autoflip_scores=False,
         Draw_class=None,
         Game_class=None,
         Player_class=None,
@@ -31,6 +32,7 @@ class TCExportReader(DataSource):
         self.__open_book(filename)
         self.__add_players_to_draws = add_players_to_draws
         self.__add_games_to_draws = add_games_to_draws
+        self.__autoflip_scores = autoflip_scores
         super().__init__(
             Player_class=Player_class or Player,
             Draw_class=Draw_class or Draw,
@@ -98,7 +100,7 @@ class TCExportReader(DataSource):
         for player in self.players.values():
             self.__add_player_to_draw(player)
 
-    def read_games(self, *, colmap=None, **kwargs):
+    def read_games(self, *, colmap=None, autoflip_scores=None, **kwargs):
         postprocess = None
         if self.__add_games_to_draws:
             if not self.draws:
@@ -109,6 +111,12 @@ class TCExportReader(DataSource):
             def postprocess(g):
                 self.__add_game_to_draw(g)
 
+        autoflip_scores = (
+            autoflip_scores
+            if autoflip_scores is not None
+            else self.__autoflip_scores
+        )
+
         rows = self.__book["Games"]
         rows.name_columns_by_row(0)
         super().read_games(
@@ -116,6 +124,7 @@ class TCExportReader(DataSource):
             rows,
             colmap=colmap,
             postprocess=postprocess,
+            autoflip_scores=autoflip_scores,
             **kwargs
         )
 

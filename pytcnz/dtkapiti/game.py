@@ -85,6 +85,7 @@ class Game(BaseGame):
         score2,
         status,
         *,
+        autoflip_scores=False,
         drawnamepat=r"\w\d{1}",
         **kwargs,
     ):
@@ -122,10 +123,13 @@ class Game(BaseGame):
                     if (scores.winner == Scores.Player.A and score2) or (
                         scores.winner == Scores.Player.B and score1
                     ):
-                        r = "-".join(map(str, (score1, score2)))
-                        raise Game.InconsistentResultError(
-                            f"Scores don't match result {r}: {scores}"
-                        )
+                        if autoflip_scores:
+                            scores.flip_scores()
+                        else:
+                            r = "-".join(map(str, (score1, score2)))
+                            raise Game.InconsistentResultError(
+                                f"Scores don't match result {r}: {scores}"
+                            )
 
             except Scores.BaseException as e:
                 raise Game.ReadError(

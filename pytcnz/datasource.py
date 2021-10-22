@@ -107,8 +107,8 @@ class DataSource:
         idcol="name",
         preprocess=None,
         postprocess=None,
+        **kwargs,
     ):
-
         colnames = cls.sanitise_colnames(colnames)
         idcol = cls.sanitise_colname(idcol)
         if colmap:
@@ -122,7 +122,7 @@ class DataSource:
             if not data[idcol]:
                 continue
 
-            p = Klass(**data)
+            p = Klass(**data | kwargs)
 
             if postprocess:
                 postprocess(p)
@@ -132,7 +132,14 @@ class DataSource:
         return colnames
 
     def read_players(
-        self, colnames, rows, *, colmap=None, preprocess=None, postprocess=None
+        self,
+        colnames,
+        rows,
+        *,
+        colmap=None,
+        preprocess=None,
+        postprocess=None,
+        **kwargs,
     ):
         if self.players:
             raise DataSource.DataAlreadyReadError("Players already read")
@@ -145,12 +152,20 @@ class DataSource:
                 colmap=colmap,
                 preprocess=preprocess,
                 postprocess=postprocess,
+                **kwargs,
             )
         except BaseException as e:
             raise DataSource.ReadError(f"While reading players: {e}")
 
     def read_draws(
-        self, colnames, rows, *, colmap=None, preprocess=None, postprocess=None
+        self,
+        colnames,
+        rows,
+        *,
+        colmap=None,
+        preprocess=None,
+        postprocess=None,
+        **kwargs,
     ):
         if self.draws:
             raise DataSource.DataAlreadyReadError("Draws already read")
@@ -163,12 +178,20 @@ class DataSource:
                 colmap=colmap,
                 preprocess=preprocess,
                 postprocess=postprocess,
+                **kwargs,
             )
         except BaseException as e:
             raise DataSource.ReadError(f"While reading draws: {e}")
 
     def read_games(
-        self, colnames, rows, *, colmap=None, preprocess=None, postprocess=None
+        self,
+        colnames,
+        rows,
+        *,
+        colmap=None,
+        preprocess=None,
+        postprocess=None,
+        **kwargs,
     ):
         if self.games:
             raise DataSource.DataAlreadyReadError("Games already read")
@@ -181,6 +204,7 @@ class DataSource:
                 colmap=colmap,
                 preprocess=preprocess,
                 postprocess=postprocess,
+                **kwargs,
             )
         except BaseException as e:
             raise DataSource.ReadError(f"While reading games: {e}")

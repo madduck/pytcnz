@@ -107,13 +107,21 @@ def test_inconsistent_scores_disagree(played_game_data):
         Game(**played_game_data | dict(status=0, score1=0, score2=1))
 
 
+def test_inconsistent_scores_autoflip(played_game_data):
+    g = Game(
+        **played_game_data
+        | dict(status=0, score1=0, score2=1, autoflip_scores=True)
+    )
+    assert g.get_scores().winner == Scores.Player.B
+
+
 def test_no_datetime_sort(game_data):
     unscheduled = Game(**game_data | dict(daytime=None))
-    assert Game(**game_data | dict(daytime='Fri 18:00')) < unscheduled
+    assert Game(**game_data | dict(daytime="Fri 18:00")) < unscheduled
 
 
 def test_sort_order_days(game_data):
-    assert Game(**game_data) < Game(**game_data | dict(daytime='Fri 18:00'))
+    assert Game(**game_data) < Game(**game_data | dict(daytime="Fri 18:00"))
 
 
 def test_no_datetime_is_none(game_data):

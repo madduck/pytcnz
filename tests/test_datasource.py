@@ -214,3 +214,9 @@ def test_set_tournament_name(datasource):
     tname = "foo"
     datasource.set_tournament_name(tname)
     assert datasource.get_tournament_name() == tname
+
+
+def test_read_rows_data(colnames, rows):
+    target = {}
+    DataSource.read_rows_into(target, colnames, rows, dict, additional="data")
+    assert target["one"]["additional"] == "data"
