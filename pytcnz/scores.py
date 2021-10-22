@@ -161,6 +161,9 @@ class Scores:
             s = f"{s}: {self.winner.name} won {self.get_games_score()}"
         return f"{s})>"
 
+    def __eq__(self, other):
+        return self._sets == other._sets
+
     def __len__(self):
         return len(self._sets)
 
