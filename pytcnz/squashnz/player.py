@@ -8,6 +8,7 @@ import enum
 import re
 from datetime import date
 import dateutil.parser
+from ..warnings import Warnings
 from ..playerbase import PlayerBase
 from ..phonenumber import PhoneNumber
 from ..exceptions import InvalidDataError
@@ -78,12 +79,11 @@ class Player(PlayerBase):
                 if number:
                     data[nr] = PhoneNumber(str(number))
             except PhoneNumber.InvalidPhoneNumber:
+                msg = f"{number} is not a valid phone number"
                 if strict:
-                    raise Player.InvalidPhoneNumber(
-                        f"{number} does not appear to be a valid phone number"
-                    )
+                    raise Player.InvalidPhoneNumber(msg)
                 else:
-                    pass
+                    Warnings.add(msg, context=f"Reading player {name}")
 
         super().__init__(name=name, gender=gender, **data)
 

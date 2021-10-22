@@ -7,6 +7,7 @@
 
 from ..exceptions import BaseException
 from ..gender import Gender
+from ..warnings import Warnings
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
@@ -387,11 +388,12 @@ class iSquashController:
                     choice.click()
                     break
         except TimeoutException:
+            msg = (
+                "iSquash does not know a player with code "
+                f"{player.squash_code}"
+            )
+            Warnings.add(msg, context="Registering players")
             if player_cb:
-                msg = (
-                    "iSquash does not know a player with code "
-                    f"{player.squash_code}"
-                )
                 player_cb(player, added=False, error=True, msg=msg)
             return
 
@@ -614,6 +616,10 @@ class iSquashController:
                 if player_cb:
                     player_cb(i, player, isqname)
             except iSquashController.NotFoundError:
+                Warnings.add(
+                    f"No iSquash player found for {player}",
+                    context=f"Populating draw {draw}, position {i+1}",
+                )
                 if player_cb:
                     player_cb(i, player, "NO REGISTERED PLAYER")
 

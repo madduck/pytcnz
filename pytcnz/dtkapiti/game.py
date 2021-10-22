@@ -9,6 +9,7 @@ from ..squashnz.game_names import get_game_name
 from ..datarecord import Placeholder
 from ..exceptions import BaseException
 from ..scores import Scores
+from ..warnings import Warnings
 import re
 import enum
 import dateutil.parser
@@ -124,6 +125,10 @@ class Game(BaseGame):
                         scores.winner == Scores.Player.B and score1
                     ):
                         if autoflip_scores:
+                            Warnings.add(
+                                f"Scores recorded in wrong order: {scores}",
+                                context=f"Reading game {name}",
+                            )
                             scores.flip_scores()
                         else:
                             r = "-".join(map(str, (score1, score2)))
