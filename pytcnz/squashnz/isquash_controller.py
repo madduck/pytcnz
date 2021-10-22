@@ -21,6 +21,7 @@ import re
 import bdb
 import argparse
 import requests
+import configparser
 
 DRAW_TYPES = {
     "8": "Draw8",
@@ -762,9 +763,16 @@ class iSquashController:
         print(msg.text, file=sys.stderr)
 
 
-def make_argument_parser(add_help=False, **kwargs):
+def make_argument_parser(add_help=False, *, configfile=None, **kwargs):
 
     argparser = argparse.ArgumentParser(add_help=add_help, **kwargs)
+    defaults = {}
+    if configfile:
+        config = configparser.ConfigParser()
+        config.read(configfile)
+        if config.has_section('iSquash'):
+            defaults = dict(config['iSquash'])
+            argparser.set_defaults(**defaults)
 
     isqgroup = argparser.add_argument_group(
         title="iSquash interaction",
@@ -774,21 +782,21 @@ def make_argument_parser(add_help=False, **kwargs):
         "--username",
         "-u",
         metavar="USERNAME",
-        required=True,
+        required='username' not in defaults,
         help="iSquash user name for login",
     )
     isqgroup.add_argument(
         "--password",
         "-p",
         metavar="PASSWORD",
-        required=True,
+        required='password' not in defaults,
         help="iSquash password for login",
     )
     isqgroup.add_argument(
         "--tournament",
         "-t",
         metavar="TOURNAMENT_CODE",
-        required=True,
+        required='tournament' not in defaults,
         help="iSquash tournament code",
     )
 
@@ -807,3 +815,6 @@ def make_argument_parser(add_help=False, **kwargs):
     )
 
     return argparser
+
+
+
