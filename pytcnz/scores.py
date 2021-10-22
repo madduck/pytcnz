@@ -148,6 +148,14 @@ class Scores:
     def get_games_score(self):
         return "-".join(map(str, self._games_score))
 
+    def flip_scores(self):
+        if self._winner == Scores.Player.A:
+            self._winner = Scores.Player.B
+        elif self._winner == Scores.Player.B:
+            self._winner = Scores.Player.A
+        self._sets = [(b, a) for (a, b) in self._sets]
+        self._games_score = self._games_score[::-1]
+
     def __str__(self):
         return self.get_scores()
 

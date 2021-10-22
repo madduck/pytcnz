@@ -233,3 +233,8 @@ def test_length(valid_score):
 
 def test_iteration(valid_score):
     assert list(valid_score)[1] == (5, 11)
+
+
+def test_flip_scores(valid_score):
+    valid_score.flip_scores()
+    assert valid_score == Scores.from_string("4-11 11-5 8-11 10-12")[0]
