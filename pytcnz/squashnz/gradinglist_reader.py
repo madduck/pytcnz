@@ -68,7 +68,7 @@ class GradingListReader(DataSource):
         else:
             gender = "Male" if gender[0].lower == "m" else "Female"
 
-        if club:
+        if club and club != "All":
             if district == "All" or district is None:
                 district = club[:2]
             else:
@@ -107,6 +107,52 @@ class GradingListReader(DataSource):
         req = requests.post(url, json=sdict)
         return req.json()
 
+    def __get_isquash_records(
+        self,
+        name=None,
+        gender=None,
+        districts=None,
+        clubs=None,
+        age=None,
+        grade=None,
+        points_min=None,
+        points_max=None,
+        sleep=0,
+    ):
+        if name and not clubs and not districts:
+            yield GradingListReader.search_grading_list(
+                name=name,
+                gender=gender,
+                district="All",
+                club="All",
+                age=age,
+                grade=grade,
+            )
+        else:
+            # iSquash limits results to 500, so we iterate by clubs
+            first = True
+            for club in self.__config["clubs"][1:]:
+                c = club["code"]
+                d = c[:2]
+                if districts and d not in districts:
+                    continue
+                elif clubs and c not in clubs:
+                    continue
+
+                if first:
+                    first = False
+                else:
+                    time.sleep(sleep)
+
+                yield GradingListReader.search_grading_list(
+                    name=name,
+                    gender=gender,
+                    district=d,
+                    club=c,
+                    age=age,
+                    grade=grade,
+                )
+
     def __get_all_player_dicts(
         self,
         name=None,
@@ -119,30 +165,17 @@ class GradingListReader(DataSource):
         points_max=None,
         sleep=0,
     ):
-        # iSquash limits results to 500, so we iterate by clubs
-        first = True
-        for club in self.__config["clubs"][1:]:
-            c = club["code"]
-            d = c[:2]
-            if districts and d not in districts:
-                continue
-            elif clubs and c not in clubs:
-                continue
-
-            if first:
-                first = False
-            else:
-                time.sleep(sleep)
-
-            records = GradingListReader.search_grading_list(
-                name=name,
-                gender=gender,
-                district=d,
-                club=c,
-                age=age,
-                grade=grade,
-            )
-
+        for records in self.__get_isquash_records(
+            name,
+            gender,
+            districts,
+            clubs,
+            age,
+            grade,
+            points_min,
+            points_max,
+            sleep,
+        ):
             gd = dict(m=(2,), f=(1,))
             for i in gd.get(gender, range(1, 3)):
                 for player in records[f"gradedPlayers{i}"]:
@@ -151,7 +184,11 @@ class GradingListReader(DataSource):
                         continue
                     elif points_max and player["points"] > points_max:
                         continue
-                    player["club"] = club["desc"]
+                    player["club"] = [
+                        c["desc"]
+                        for c in self.clubs
+                        if player["squashCode"].startswith(c["code"])
+                    ][0]
                     yield player
 
     def read_players(
@@ -266,11 +303,15 @@ def make_argument_parser(
         "--grade", "-r", choices=grade_choices, help="Limit by grade"
     )
     searchg.add_argument(
-        "--minpoints", "-m", type=int,
+        "--minpoints",
+        "-m",
+        type=int,
         help="Only include players above this points limit (inclusive)",
     )
     searchg.add_argument(
-        "--maxpoints", "-x", type=int,
+        "--maxpoints",
+        "-x",
+        type=int,
         help="Only include players below this points limit (inclusive)",
     )
     argparser.add_argument(
