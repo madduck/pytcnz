@@ -122,3 +122,9 @@ def test_first_name_extraction(name_and_firstname):
     assert (
         Player.get_first_name(name_and_firstname[0]) == name_and_firstname[1]
     )
+
+
+def test_equality_ignores_id(player_data):
+    p1 = Player(**player_data)
+    p2 = Player(**player_data | dict(id='foo'))
+    assert p1 == p2

@@ -93,6 +93,11 @@ class Player(PlayerBase):
             f"{self.grade} @ {self.points:,d} pts)>"
         )
 
+    def __eq__(self, other):
+        d1 = self.data | dict(id=None)
+        d2 = other.data | dict(id=None)
+        return d1 == d2
+
     @classmethod
     def get_age_for_dob(cls, dob, *, onday=None):
         onday = onday or date.today()
@@ -120,8 +125,7 @@ class Player(PlayerBase):
     @classmethod
     def get_name_cleaned(cls, name, *, ignore_salutations=None):
         ignore_salutations = sorted(
-            ignore_salutations or cls.SALUTATIONS,
-            key=lambda x: -len(x)
+            ignore_salutations or cls.SALUTATIONS, key=lambda x: -len(x)
         )
         pat = rf"^(?:(?:{'|'.join(ignore_salutations)})\.?\s*)*"
         name = re.sub(pat, "", name)
