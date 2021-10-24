@@ -241,14 +241,14 @@ def make_argument_parser(
         "-g",
         choices=gender_choices,
         dest="gender",
-        help="Limit by district, or districts if specified " "more than once",
+        help="Limit by gender",
     )
     searchg.add_argument(
         "--district",
         "-d",
         action="append",
         choices=district_choices,
-        help="Limit by district, or districts if specified " "more than once",
+        help="Limit by district, or districts if specified more than once",
     )
     searchg.add_argument(
         "--club",
@@ -263,13 +263,15 @@ def make_argument_parser(
         "--age", "-a", choices=age_choices, help="Limit by age group"
     )
     searchg.add_argument(
-        "--grade", "-r", choices=grade_choices, help="Limit by age group"
+        "--grade", "-r", choices=grade_choices, help="Limit by grade"
     )
     searchg.add_argument(
-        "--minpoints", "-m", type=int, help="Limit by age group"
+        "--minpoints", "-m", type=int,
+        help="Only include players above this points limit (inclusive)",
     )
     searchg.add_argument(
-        "--maxpoints", "-x", type=int, help="Limit by age group"
+        "--maxpoints", "-x", type=int,
+        help="Only include players below this points limit (inclusive)",
     )
     argparser.add_argument(
         "--sleep",
