@@ -10,6 +10,7 @@ import requests
 from urllib.parse import urljoin
 import argparse
 import time
+import re
 
 
 class GradingListReader(DataSource):
@@ -33,11 +34,12 @@ class GradingListReader(DataSource):
             self.genders + [f[0].lower() for f in self.genders],
             key=lambda x: x.lower(),
         )
-        self.districts = self.__config.get("districts")[1:]
-        self.district_choices = [
-            d["code"] for d in self.__config.get("districts")[1:]
-        ]
-        self.clubs = self.__config.get("clubs")[1:]
+        self.districts = dict(
+            (i["code"], i["desc"]) for i in self.__config.get("districts")[1:]
+        )
+        self.clubs = dict(
+            (i["code"], i["desc"]) for i in self.__config.get("clubs")[1:]
+        )
         self.ages = self.__config.get("ages")[1:]
         self.age_choices = sorted(
             self.ages + [f[0].lower() for f in self.ages],
@@ -62,6 +64,7 @@ class GradingListReader(DataSource):
         age="Any",
         grade="Any",
     ):
+        name = name or ""
 
         if not gender:
             gender = "Both"
@@ -74,9 +77,9 @@ class GradingListReader(DataSource):
             else:
                 if not club.startswith(district):
                     club = None
+        else:
+            club = "All"
 
-        name = name or ""
-        club = club or "All"
         district = district or "All"
 
         if not age:
@@ -95,7 +98,7 @@ class GradingListReader(DataSource):
         elif len(grade) == 1:
             grade = grade.upper()  # noqa:E701
 
-        url = urljoin(cls.BASE_URL, "search")
+        url = urljoin(GradingListReader.BASE_URL, "search")
         sdict = dict(
             name=name,
             gender=gender,
@@ -106,6 +109,13 @@ class GradingListReader(DataSource):
         )
         req = requests.post(url, json=sdict)
         return req.json()
+
+    def __get_code(self, dict, term):
+        if term in dict:
+            return term
+        for k, v in dict.items():
+            if re.search(term, v, re.IGNORECASE):
+                return k
 
     def __get_isquash_records(
         self,
@@ -129,14 +139,20 @@ class GradingListReader(DataSource):
                 grade=grade,
             )
         else:
+            districts = [
+                self.__get_code(self.districts, i) for i in districts or []
+            ]
+            clubs = [
+                self.__get_code(self.clubs, i)
+                for i in clubs or []
+            ]
             # iSquash limits results to 500, so we iterate by clubs
             first = True
-            for club in self.__config["clubs"][1:]:
-                c = club["code"]
-                d = c[:2]
-                if districts and d not in districts:
-                    continue
-                elif clubs and c not in clubs:
+            for club in self.clubs:
+                district = club[:2]
+                if (clubs and club not in clubs) or (
+                    districts and district not in districts
+                ):
                     continue
 
                 if first:
@@ -147,8 +163,8 @@ class GradingListReader(DataSource):
                 yield GradingListReader.search_grading_list(
                     name=name,
                     gender=gender,
-                    district=d,
-                    club=c,
+                    district=district,
+                    club=club,
                     age=age,
                     grade=grade,
                 )
@@ -184,11 +200,7 @@ class GradingListReader(DataSource):
                         continue
                     elif points_max and player["points"] > points_max:
                         continue
-                    player["club"] = [
-                        c["desc"]
-                        for c in self.clubs
-                        if player["squashCode"].startswith(c["code"])
-                    ][0]
+                    player["club"] = self.clubs[player["squashCode"][:4]]
                     yield player
 
     def read_players(
@@ -255,8 +267,6 @@ class GradingListReader(DataSource):
 def make_argument_parser(
     *,
     gender_choices=None,
-    district_choices=None,
-    club_choices=None,
     age_choices=None,
     grade_choices=None,
     sleep_default=0,
@@ -284,7 +294,6 @@ def make_argument_parser(
         "--district",
         "-d",
         action="append",
-        choices=district_choices,
         help="Limit by district, or districts if specified more than once",
     )
     searchg.add_argument(
@@ -292,7 +301,6 @@ def make_argument_parser(
         "-c",
         type=str,
         action="append",
-        choices=club_choices,
         help="Limit by club, or clubs if specified more than "
         "once (district takes precedence)",
     )
