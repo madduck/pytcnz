@@ -20,14 +20,16 @@ class SquashNZGrading:
         D1 = 1800
         D2 = 1500
         E1 = 1200
-        E2 = 900  # noqa:E222
-        F = 600  # noqa:E221,E222
+        E2 = 900
+        F = 600
+        Ungraded = 0
 
     class Points_Junior_Men(enum.IntEnum):
-        J1 = 700  # noqa:E222
-        J2 = 500  # noqa:E222
-        J3 = 300  # noqa:E222
-        J4 = 100  # noqa:E222
+        J1 = 700
+        J2 = 500
+        J3 = 300
+        J4 = 100
+        Ungraded = 0
 
     class Points_Women(enum.IntEnum):
         A1 = 3200
@@ -37,15 +39,17 @@ class SquashNZGrading:
         C1 = 1800
         C2 = 1500
         D1 = 1200
-        D2 = 900  # noqa:E222
-        E = 600  # noqa:E221,E222
-        F = 300  # noqa:E221,E222
+        D2 = 900
+        E = 600
+        F = 300
+        Ungraded = 0
 
     class Points_Junior_Women(enum.IntEnum):
-        J1 = 500  # noqa:E222
-        J2 = 300  # noqa:E222
-        J3 = 100  # noqa:E222
-        J4 = 5  # noqa:E222
+        J1 = 500
+        J2 = 300
+        J3 = 100
+        J4 = 5
+        Ungraded = 0
 
     class Points_Ungendered(enum.IntEnum):
         Ungraded = 0
@@ -73,7 +77,9 @@ class SquashNZGrading:
                 f"Not a valid gender for grading: {gender.name}"
             )
         for th in list(table):
-            if points >= th:
+            if (th != table.Ungraded and points >= th) or (
+                th == table.Ungraded and points == th
+            ):
                 return th
 
         raise SquashNZGrading.InvalidGradingError(
@@ -125,6 +131,7 @@ if __name__ == "__main__":
     print(repr(grading))
     try:
         import ipdb
+
         ipdb.set_trace()
     except ImportError:
         pass

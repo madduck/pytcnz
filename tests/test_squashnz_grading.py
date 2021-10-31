@@ -13,19 +13,19 @@ from pytcnz.squashnz.grading import SquashNZGrading
         ("W", False, 3500, "A1"),
         ("W", False, 2870, "A2"),
         ("W", False, 1430, "D1"),
-        ("W", False, 590, "F"),  # noqa:E202
+        ("W", False, 590, "F"),
         ("W", True, 590, "J1"),
         ("W", True, 250, "J3"),
+        ("W", False, 0, "Ungraded"),
+        ("W", True, 0, "Ungraded"),
         ("M", False, 4500, "A1"),
         ("M", False, 2980, "B2"),
         ("M", False, 1430, "E1"),
-        ("M", False, 690, "F"),  # noqa:E202
+        ("M", False, 690, "F"),
         ("M", True, 690, "J2"),
         ("M", True, 250, "J4"),
-        ("N", False, 250, "Ungraded"),
-        ("N", True, 250, "Ungraded"),
-        ("N", False, 3000, "Ungraded"),
-        ("N", True, 3000, "Ungraded"),
+        ("M", False, 0, "Ungraded"),
+        ("M", True, 0, "Ungraded"),
     ]
 )
 def grading_tuplets(request):
@@ -81,11 +81,27 @@ def test_sort_order_different_genders(lower_grading, grading):
     assert lower_grading < grading
 
 
-@pytest.fixture(params=[-1, 0])
+@pytest.fixture(
+    params=[
+        ("W", False, -1),
+        ("W", False, 100),
+        ("W", True, -1),
+        ("W", True, 1),
+        ("M", False, -1),
+        ("M", False, 500),
+        ("M", True, -1),
+        ("M", True, 50),
+        ("N", False, 250),
+        ("N", True, 250),
+        ("N", False, 3000),
+        ("N", True, 3000),
+    ]
+)
 def invalid_points(request):
     return request.param
 
 
 def test_invalid_points(invalid_points):
+    gender, junior, points = invalid_points
     with pytest.raises(SquashNZGrading.InvalidGradingError):
-        SquashNZGrading(invalid_points, "W")
+        SquashNZGrading(points, gender, junior)
