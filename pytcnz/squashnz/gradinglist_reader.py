@@ -122,6 +122,7 @@ class GradingListReader(DataSource):
 
     def __get_isquash_records(
         self,
+        *,
         name=None,
         gender=None,
         districts=None,
