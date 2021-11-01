@@ -113,6 +113,9 @@ class GradingListReader(DataSource):
     def __get_code(self, dict, term):
         if term in dict:
             return term
+        elif term.upper() in dict:
+            return term.upper()
+
         for k, v in dict.items():
             if re.search(term, v, re.IGNORECASE):
                 return k
