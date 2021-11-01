@@ -120,102 +120,129 @@ class GradingListReader(DataSource):
             if re.search(term, v, re.IGNORECASE):
                 return k
 
-    def __get_isquash_records(
+    def __iterate_grades_ages(
         self,
         *,
         name=None,
-        gender=None,
-        districts=None,
-        clubs=None,
-        age=None,
-        grade=None,
-        points_min=None,
-        points_max=None,
+        district=None,
+        club=None,
+        ages=None,
+        grades=None,
         sleep=0,
+        first=True,
     ):
-        if name and not clubs and not districts:
-            yield GradingListReader.search_grading_list(
-                name=name,
-                gender=gender,
-                district="All",
-                club="All",
-                age=age,
-                grade=grade,
-            )
-        else:
-            districts = [
-                self.__get_code(self.districts, i) for i in districts or []
-            ]
-            clubs = [
-                self.__get_code(self.clubs, i)
-                for i in clubs or []
-            ]
-            # iSquash limits results to 500, so we iterate by clubs
-            first = True
-            for club in self.clubs:
-                district = club[:2]
-                if (clubs and club not in clubs) or (
-                    districts and district not in districts
-                ):
-                    continue
-
+        male, female = [], []
+        for grade in grades or ["Any"]:
+            for age in ages or ["Any"]:
                 if first:
                     first = False
                 else:
                     time.sleep(sleep)
 
-                yield GradingListReader.search_grading_list(
+                ret = GradingListReader.search_grading_list(
                     name=name,
-                    gender=gender,
                     district=district,
                     club=club,
                     age=age,
                     grade=grade,
                 )
+                female.extend(ret['gradedPlayers1'])
+                male.extend(ret['gradedPlayers2'])
+
+        return female, male
+
+
+    def __get_isquash_records(
+        self,
+        *,
+        name=None,
+        districts=None,
+        clubs=None,
+        ages=None,
+        grades=None,
+        sleep=0,
+    ):
+        if name and not clubs and not districts:
+            return self.__iterate_grades_ages(
+                name=name,
+                ages=ages,
+                grades=grades,
+                sleep=sleep,
+            )
+
+        else:
+            districts = [
+                self.__get_code(self.districts, i) for i in districts or []
+            ]
+            clubs = [self.__get_code(self.clubs, i) for i in clubs or []]
+            # iSquash limits results to 500, so we iterate by clubs
+            first = True
+            male, female = [], []
+            for club in self.clubs:
+                district = club[:2]
+                if False and district == 'WN':
+                    import ipdb; ipdb.set_trace()  # noqa:E402,E702
+                if (clubs and (club not in clubs)) or (
+                    districts and (district not in districts)
+                ):
+                    continue
+
+                ret = self.__iterate_grades_ages(
+                    name=name,
+                    district=district,
+                    club=club,
+                    ages=ages,
+                    grades=grades,
+                    sleep=sleep,
+                    first=first,
+                )
+                female.extend(ret[0])
+                male.extend(ret[1])
+
+            return female, male
 
     def __get_all_player_dicts(
         self,
         name=None,
-        gender=None,
+        genders=None,
         districts=None,
         clubs=None,
-        age=None,
-        grade=None,
+        ages=None,
+        grades=None,
         points_min=None,
         points_max=None,
         sleep=0,
     ):
-        for records in self.__get_isquash_records(
-            name,
-            gender,
-            districts,
-            clubs,
-            age,
-            grade,
-            points_min,
-            points_max,
-            sleep,
-        ):
-            gd = dict(m=(2,), f=(1,))
-            for i in gd.get(gender, range(1, 3)):
-                for player in records[f"gradedPlayers{i}"]:
+        female, male = self.__get_isquash_records(
+            name=name,
+            districts=districts,
+            clubs=clubs,
+            ages=ages,
+            grades=grades,
+            sleep=sleep,
+        )
 
-                    if points_min and player["points"] < points_min:
-                        continue
-                    elif points_max and player["points"] > points_max:
-                        continue
-                    player["club"] = self.clubs[player["squashCode"][:4]]
-                    yield player
+        for gender, players in (("f", female), ("m", male)):
+            if genders and (gender not in genders):
+                continue
+
+            for player in players:
+                if points_min and player["points"] < points_min:
+                    continue
+                elif points_max and player["points"] > points_max:
+                    continue
+                player["club"] = self.clubs[player["squashCode"][:4]]
+                yield player
 
     def read_players(
         self,
         *,
         name=None,
-        gender=None,
+        genders=None,
         districts=None,
         clubs=None,
-        age=None,
-        grade=None,
+        ages=None,
+        grades=None,
         points_min=None,
         points_max=None,
         colmap=None,
@@ -236,11 +263,11 @@ class GradingListReader(DataSource):
         records = []
         for player in self.__get_all_player_dicts(
             name=name,
-            gender=gender,
+            genders=genders,
             districts=districts,
             clubs=clubs,
-            age=age,
-            grade=grade,
+            ages=ages,
+            grades=grades,
             points_min=points_min,
             points_max=points_max,
             sleep=sleep,
@@ -291,7 +318,8 @@ def make_argument_parser(
         "--gender",
         "-g",
         choices=gender_choices,
-        dest="gender",
+        type=str,
+        action="append",
         help="Limit by gender",
     )
     searchg.add_argument(
@@ -309,10 +337,20 @@ def make_argument_parser(
         "once (district takes precedence)",
     )
     searchg.add_argument(
-        "--age", "-a", choices=age_choices, help="Limit by age group"
+        "--age",
+        "-a",
+        choices=age_choices,
+        type=str,
+        action="append",
+        help="Limit by age group (can be given more than once)",
     )
     searchg.add_argument(
-        "--grade", "-r", choices=grade_choices, help="Limit by grade"
+        "--grade",
+        "-r",
+        choices=grade_choices,
+        type=str,
+        action="append",
+        help="Limit by grade (can be given more than once)",
     )
     searchg.add_argument(
         "--minpoints",
