@@ -22,6 +22,7 @@ import bdb
 import argparse
 import requests
 import configparser
+import os.path
 
 DRAW_TYPES = {
     "8": "Draw8",
@@ -74,15 +75,23 @@ class iSquashController:
         pass
 
     @classmethod
-    def __get_firefox_driver(cls, headless=False):
+    def __get_firefox_driver(cls, *, headless=False, service_log_path=None):
         profile = webdriver.FirefoxProfile()
         options = webdriver.FirefoxOptions()
         options.headless = headless
-        return webdriver.Firefox(firefox_profile=profile, options=options)
+        return webdriver.Firefox(
+            firefox_profile=profile,
+            options=options,
+            service_log_path=service_log_path or os.path.devnull,
+        )
 
-    def __init__(self, *, headless=False, pagewait=5, debug=False):
+    def __init__(
+        self, *, headless=False, service_log_path=None, pagewait=5, debug=False
+    ):
         self.state = self.State.init
-        self.driver = iSquashController.__get_firefox_driver(headless)
+        self.driver = iSquashController.__get_firefox_driver(
+            headless=headless, service_log_path=service_log_path
+        )
         self.state = self.State.ready
         self.driver.implicitly_wait(pagewait)
         self.soup = None
