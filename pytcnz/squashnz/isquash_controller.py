@@ -779,8 +779,8 @@ def make_argument_parser(add_help=False, *, configfile=None, **kwargs):
     if configfile:
         config = configparser.ConfigParser()
         config.read(configfile)
-        if config.has_section('iSquash'):
-            defaults = dict(config['iSquash'])
+        if config.has_section("iSquash"):
+            defaults = dict(config["iSquash"])
             argparser.set_defaults(**defaults)
 
     isqgroup = argparser.add_argument_group(
@@ -791,21 +791,21 @@ def make_argument_parser(add_help=False, *, configfile=None, **kwargs):
         "--username",
         "-u",
         metavar="USERNAME",
-        required='username' not in defaults,
+        required="username" not in defaults,
         help="iSquash user name for login",
     )
     isqgroup.add_argument(
         "--password",
         "-p",
         metavar="PASSWORD",
-        required='password' not in defaults,
+        required="password" not in defaults,
         help="iSquash password for login",
     )
     isqgroup.add_argument(
         "--tournament",
         "-t",
         metavar="TOURNAMENT_CODE",
-        required='tournament' not in defaults,
+        required="tournament" not in defaults,
         help="iSquash tournament code",
     )
 
@@ -824,6 +824,3 @@ def make_argument_parser(add_help=False, *, configfile=None, **kwargs):
     )
 
     return argparser
-
-
-
