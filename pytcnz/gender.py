@@ -36,3 +36,7 @@ class Gender(enum.Enum):
                 return cls.__members__[gender]
             except KeyError:
                 raise InvalidGenderError(f"{gender} is not a valid gender")
+
+    @classmethod
+    def to_sex(cls, gender):
+        return {cls.M: "Male", cls.W: "Female", cls.N: "None"}[gender]
