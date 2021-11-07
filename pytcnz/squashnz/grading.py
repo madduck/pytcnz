@@ -9,8 +9,18 @@ from ..gender import Gender, InvalidGenderError
 import enum
 
 
+class GradingEnum(enum.IntEnum):
+    @classmethod
+    def make_junior_grading_enum(cls, name, *tuples):
+        shared = [(i.value, i.name) for i in list(cls) if i.name != "F"]
+        shared.extend((b, a) for a, b in tuples)
+        return enum.IntEnum(
+            name, [(b, a) for a, b in sorted(shared, reverse=True)]
+        )
+
+
 class SquashNZGrading:
-    class Points_Men(enum.IntEnum):
+    class Points_Men(GradingEnum):
         A1 = 4000
         A2 = 3500
         B1 = 3100
@@ -24,14 +34,15 @@ class SquashNZGrading:
         F = 600
         Ungraded = 0
 
-    class Points_Junior_Men(enum.IntEnum):
-        J1 = 700
-        J2 = 500
-        J3 = 300
-        J4 = 100
-        Ungraded = 0
+    Points_Junior_Men = Points_Men.make_junior_grading_enum(
+        "Points_Junior_Men",
+        ("J1", 700),
+        ("J2", 500),
+        ("J3", 300),
+        ("J4", 100),
+    )
 
-    class Points_Women(enum.IntEnum):
+    class Points_Women(GradingEnum):
         A1 = 3200
         A2 = 2700
         B1 = 2400
@@ -44,12 +55,13 @@ class SquashNZGrading:
         F = 300
         Ungraded = 0
 
-    class Points_Junior_Women(enum.IntEnum):
-        J1 = 500
-        J2 = 300
-        J3 = 100
-        J4 = 5
-        Ungraded = 0
+    Points_Junior_Women = Points_Women.make_junior_grading_enum(
+        "Points_Junior_Women",
+        ("J1", 500),
+        ("J2", 300),
+        ("J3", 100),
+        ("J4", 5),
+    )
 
     class Points_Ungendered(enum.IntEnum):
         Ungraded = 0
@@ -65,13 +77,10 @@ class SquashNZGrading:
             )
         try:
             table = {
-                (Gender.M, False): cls.Points_Men,
-                (Gender.M, True): cls.Points_Junior_Men,
-                (Gender.W, False): cls.Points_Women,
-                (Gender.W, True): cls.Points_Junior_Women,
-                (Gender.N, False): cls.Points_Ungendered,
-                (Gender.N, True): cls.Points_Ungendered,
-            }[(gender, junior)]
+                Gender.M: (cls.Points_Men, cls.Points_Junior_Men),
+                Gender.W: (cls.Points_Women, cls.Points_Junior_Women),
+                Gender.N: (cls.Points_Ungendered, cls.Points_Ungendered),
+            }[gender][1 if junior else 0]
         except KeyError:
             raise InvalidGenderError(
                 f"Not a valid gender for grading: {gender.name}"

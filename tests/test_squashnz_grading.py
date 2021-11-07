@@ -105,3 +105,25 @@ def test_invalid_points(invalid_points):
     gender, junior, points = invalid_points
     with pytest.raises(SquashNZGrading.InvalidGradingError):
         SquashNZGrading(points, gender, junior)
+
+@pytest.fixture(
+    params=[
+        ("W", 50, "J4"),
+        ("W", 250, "J3"),
+        ("W", 450, "J2"),
+        ("W", 550, "J1"),
+        ("W", 600, "E"),
+        ("M", 250, "J4"),
+        ("M", 450, "J3"),
+        ("M", 650, "J2"),
+        ("M", 850, "J1"),
+        ("M", 900, "E2"),
+    ]
+)
+def junior_tuplet(request):
+    return request.param
+
+def test_junior_transition(junior_tuplet):
+    gender, points, grade = junior_tuplet
+    g = SquashNZGrading(points, gender, True)
+    assert g.grade == grade
