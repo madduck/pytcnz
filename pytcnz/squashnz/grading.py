@@ -86,10 +86,17 @@ class SquashNZGrading:
                 f"Not a valid gender for grading: {gender.name}"
             )
         for th in list(table):
-            if (th != table.Ungraded and points >= th) or (
-                th == table.Ungraded and points == th
-            ):
+            if th != table.Ungraded and points >= th:
                 return th
+
+            elif th == table.Ungraded:
+                if gender == Gender.N:
+                    # Ungraded can have points when there is no gender
+                    return th
+
+                elif points == th:
+                    # Ungraded gendered players must be 0…
+                    return th
 
         raise SquashNZGrading.InvalidGradingError(
             f"No grade for {points} points"

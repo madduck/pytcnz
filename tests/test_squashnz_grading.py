@@ -26,6 +26,10 @@ from pytcnz.squashnz.grading import SquashNZGrading
         ("M", True, 250, "J4"),
         ("M", False, 0, "Ungraded"),
         ("M", True, 0, "Ungraded"),
+        ("N", False, 0, "Ungraded"),
+        ("N", True, 0, "Ungraded"),
+        ("N", False, 2000, "Ungraded"),
+        ("N", True, 2000, "Ungraded"),
     ]
 )
 def grading_tuplets(request):
@@ -91,10 +95,6 @@ def test_sort_order_different_genders(lower_grading, grading):
         ("M", False, 500),
         ("M", True, -1),
         ("M", True, 50),
-        ("N", False, 250),
-        ("N", True, 250),
-        ("N", False, 3000),
-        ("N", True, 3000),
     ]
 )
 def invalid_points(request):
