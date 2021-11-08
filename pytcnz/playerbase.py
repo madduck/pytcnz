@@ -30,7 +30,7 @@ class PlayerBase(DataRecord):
         return self.name.__lt__(other.name)
 
     def __hash__(self):
-        hash(self.name)
+        return hash(self.name)
 
     def fill_template(self, template, **extra_data):
         d = self.data | extra_data
