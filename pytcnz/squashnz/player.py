@@ -95,6 +95,8 @@ class Player(PlayerBase):
         )
 
     def __eq__(self, other):
+        if not other:
+            return False
         d1 = self.data | dict(id=None)
         d2 = other.data | dict(id=None)
         return d1 == d2
