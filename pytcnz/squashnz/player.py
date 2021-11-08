@@ -16,6 +16,7 @@ from .grading import SquashNZGrading
 
 
 class Player(PlayerBase):
+
     class InvalidPhoneNumber(InvalidDataError):
         pass
 

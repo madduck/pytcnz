@@ -6,12 +6,11 @@
 
 from ..datarecord import Placeholder
 from ..phonenumber import PhoneNumber
+from ..warnings import Warnings
 from ..squashnz.player import Player as BasePlayer
 
 
 class Player(BasePlayer):
-
-    InvalidPhoneNumber = BasePlayer.InvalidPhoneNumber
 
     def __init__(
         self,
@@ -37,12 +36,17 @@ class Player(BasePlayer):
         )
 
         for nr in ("phone", "mobile", "number"):
+            # TODO: fold into super-class
             try:
                 number = data.get(nr)
                 if number:
                     data[nr] = PhoneNumber(str(number))
             except PhoneNumber.InvalidPhoneNumber:
-                pass
+                msg = f"{number} is not a valid phone number"
+                if strict:
+                    raise BasePlayer.InvalidPhoneNumber(msg)
+                else:
+                    Warnings.add(msg, context=f"Reading player {name}")
 
         super().__init__(
             name=name,
