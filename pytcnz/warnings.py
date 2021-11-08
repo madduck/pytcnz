@@ -68,10 +68,10 @@ class _Warnings(object):
             print("Warnings:", file=sys.stderr)
             print(self.get_string(indent=" "), file=sys.stderr)
 
-    def add(self, details, *, context=None, **kwargs):
-        self.__class__._instance.warnings.append(
-            Warning(details=details, context=context, **kwargs)
-        )
+    def add(self, details, *, skip_duplicates=True, context=None, **kwargs):
+        w = Warning(details=details, context=context, **kwargs)
+        if not skip_duplicates or w not in self.__class__._instance.warnings:
+            self.__class__._instance.warnings.append(w)
 
     def clear(self):
         self.__class__._instance.warnings = []

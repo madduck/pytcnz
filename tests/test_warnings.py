@@ -28,3 +28,12 @@ def test_bool():
     assert not Warnings
     Warnings.add("")
     assert Warnings
+
+
+def test_skip_duplicates():
+    Warnings.clear()
+    Warnings.add('test')
+    Warnings.add('test')
+    assert len(Warnings) == 1
+    Warnings.add('test', test_skip_duplicates=False)
+    assert len(Warnings) == 2
