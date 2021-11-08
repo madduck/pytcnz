@@ -8,6 +8,7 @@
 from ..exceptions import BaseException
 from ..gender import Gender
 from ..warnings import Warnings
+from ..util import get_timestamp
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
@@ -354,9 +355,16 @@ class iSquashController:
                 player_cb(player, False)
 
         for player in to_register:
-            self.go_register_player(player, player_cb=player_cb)
+            self.go_register_player(
+                player,
+                player_cb=player_cb,
+                default_comment=f"Bulk-registered by {self.username} "
+                f"on {get_timestamp()}",
+            )
 
-    def go_register_player(self, player, *, player_cb=None):
+    def go_register_player(
+        self, player, *, player_cb=None, default_comment=None
+    ):
         if (
             self.state < self.State.pre_tournament
             or self.state > self.State.registering
@@ -420,17 +428,17 @@ class iSquashController:
         self.driver.find_element(
             By.ID, "makeTournamentRegistration:" "addPlayer"
         ).click()
-        try:
-            comments = player.comments
-            email = player.email
-        except AttributeError:
-            pass
-        else:
+
+        email = player.get("email")
+        if email:
             el = self.driver.find_element(
                 By.ID, "makeTournamentRegistration:email"
             )
             el.clear()
             el.send_keys(email)
+
+        comments = player.get("comments", default_comment)
+        if comments:
             el = self.driver.find_element(
                 By.ID, "makeTournamentRegistration:comment"
             )
