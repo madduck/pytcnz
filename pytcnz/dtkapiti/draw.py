@@ -24,7 +24,10 @@ class Draw(BaseDraw):
     @classmethod
     def delphi_colour_to_rgb(cls, c):
         # Delphi stores colours in reverse order to RGB
-        return f"{c[7:]}{c[5:7]}{c[3:5]}"
+        try:
+            return f"{c[7:]}{c[5:7]}{c[3:5]}"
+        except TypeError:
+            return cls.delphi_colour_to_rgb(f"$00{c}")
 
     def __init__(self, name, *, gendered=None, **kwargs):
         self.players = []

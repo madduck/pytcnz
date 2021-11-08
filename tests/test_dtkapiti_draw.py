@@ -55,3 +55,8 @@ def test_add_player_not_seeded(draw):
     unseeded = Player(**make_player_data(id='W00'))
     with pytest.raises(Draw.InvalidPlayerError):
         draw.add_player(unseeded)
+
+
+def test_numeric_colour(draw_data):
+    d = Draw(**draw_data | dict(colour=611651))
+    assert d.colour == "511661"
