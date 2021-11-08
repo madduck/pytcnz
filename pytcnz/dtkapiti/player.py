@@ -45,6 +45,9 @@ class Player(BasePlayer):
         except PhoneNumber.InvalidPhoneNumber:
             mobile = None
 
+        if dob == "(invalid date )":
+            dob = None
+
         super().__init__(
             id=id,
             name=name,
