@@ -156,3 +156,8 @@ def test_fancy_game_name_round3_no_drawsize(game_data):
 def test_fancy_game_name_round3_8draw(game_data):
     final = Game(**game_data | dict(name="W0301"))
     assert final.get_fancy_name(drawsize=8) == "Championship Final"
+
+
+@pytest.mark.xfail  # TODO expected to fail until we resolve BYE/defaults
+def test_game_with_defaulted_player(game_data):
+    g = Game(**game_data | dict(status=-1))

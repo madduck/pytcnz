@@ -112,8 +112,20 @@ class Game(BaseGame):
                 )
 
             if not (score1 ^ score2):
+                # TODO if a player defaults and the "Default" tick is set for
+                # that player, TournamentControl will propagate the result to
+                # subsequent rounds, and mark each game status=-1 for the
+                # player, but the game scores will be both 0.
+                #
+                # Maybe the solution is to use Placeholders for the players
+                # too, and if they have been set, then we can access the
+                # default=='Y' attribute and act accordingly.
+                #
+                # This might also be the way to go about BYEs.
+                #
+                # See also: test_game_with_defaulted_player
                 raise Game.InconsistentResultError(
-                    "Game needs exactly one winner"
+                    f"Game {name} needs exactly one winner"
                 )
 
             try:
