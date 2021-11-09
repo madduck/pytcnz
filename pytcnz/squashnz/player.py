@@ -139,10 +139,6 @@ class Player(PlayerBase):
         parts = cls.get_name_cleaned(
             name, ignore_salutations=ignore_salutations
         ).split()
-        if len(parts) <= 1:
-            raise Player.NameParseError(
-                f"Failed to determine first name of {name}"
-            )
         return parts[0]
 
 

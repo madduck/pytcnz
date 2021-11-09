@@ -128,3 +128,7 @@ def test_equality_ignores_id(player_data):
     p1 = Player(**player_data)
     p2 = Player(**player_data | dict(id='foo'))
     assert p1 == p2
+
+
+def test_single_word_name(player_data):
+    p = Player(**player_data | dict(name="Bye"))
