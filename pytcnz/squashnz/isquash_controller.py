@@ -9,9 +9,11 @@ from ..exceptions import BaseException
 from ..gender import Gender
 from ..warnings import Warnings
 from ..util import get_timestamp
+from ..scores import Scores
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from urllib.parse import urljoin
@@ -724,6 +726,20 @@ class iSquashController:
                             f"While entering results for {game}: "
                             f"{pname} is not {isqname}"
                         )
+
+            played = self.driver.find_element(
+                By.XPATH,
+                f"//*[@id='myForm']/table/tbody/tr[{rowx+1}]/td[2]/select",
+            )
+            if game.is_played():
+                Select(played).select_by_value("Played")
+                scores = game.scores
+            else:
+                Select(played).select_by_value("NotPlayed")
+                if game.get_winner() == game.players[0]:
+                    scores = Scores(((11, 0), (11, 0), (11, 0)))
+                else:
+                    scores = Scores(((0, 11), (0, 11), (0, 11)))
 
             if scores:
                 tr_xpath = f"//*[@id='myForm']/table/tbody/tr[{rowx}]"
