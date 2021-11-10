@@ -715,26 +715,6 @@ class iSquashController:
                     f"Game {game.name} not in {row}"
                 )
 
-            tr_xpath = f"//*[@id='myForm']/table/tbody/tr[{rowx}]"
-
-            scorecell1 = self.driver.find_element(
-                By.XPATH, f"{tr_xpath}/td[5]/input"
-            )
-            if scorecell1.get_attribute("disabled"):
-                # iSquash is not ready to receive our scores yet, whether we
-                # have them or not.
-                print(f"    skip: {game!r}", file=sys.stderr)
-                continue
-
-            if reset:
-                print(f"    rset: {game!r}", file=sys.stderr)
-            else:
-                print(f"          {game!r}", file=sys.stderr)
-
-            scores = list(game.get_scores()) if not reset else list()
-            for i in range(len(scores), 5):
-                scores.append((0, 0))
-
             for player in (0, 1):
                 isqname = row.find_all("td")[2 + player].text
                 pname = game.players[player].name
@@ -745,14 +725,34 @@ class iSquashController:
                             f"{pname} is not {isqname}"
                         )
 
-            for gamenr, score in enumerate(scores):
-                for player in (0, 1):
-                    cell = self.driver.find_element(
-                        By.XPATH,
-                        f"{tr_xpath}/td[5+{gamenr*2}+{player}]" "/input",
-                    )
-                    cell.clear()
-                    cell.send_keys(str(score[player]))
+            if scores:
+                tr_xpath = f"//*[@id='myForm']/table/tbody/tr[{rowx}]"
+                scorecell1 = self.driver.find_element(
+                    By.XPATH, f"{tr_xpath}/td[5]/input"
+                )
+                if scorecell1.get_attribute("disabled"):
+                    # iSquash is not ready to receive our scores yet, whether we
+                    # have them or not.
+                    print(f"    skip: {game!r}", file=sys.stderr)
+                    continue
+
+                if reset:
+                    print(f"    rset: {game!r}", file=sys.stderr)
+                else:
+                    print(f"          {game!r}", file=sys.stderr)
+
+                scores = list(scores) if not reset else list()
+                for i in range(len(scores), 5):
+                    scores.append((0, 0))
+
+                for gamenr, score in enumerate(scores):
+                    for player in (0, 1):
+                        cell = self.driver.find_element(
+                            By.XPATH,
+                            f"{tr_xpath}/td[5+{gamenr*2}+{player}]" "/input",
+                        )
+                        cell.clear()
+                        cell.send_keys(str(score[player]))
 
             entered.append(game)
 
