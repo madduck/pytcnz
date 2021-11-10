@@ -59,6 +59,9 @@ class Player(BasePlayer):
             **kwargs,
         )
 
+    def has_defaulted(self):
+        return self.get('default', 'N').upper() == 'Y'
+
 
 if __name__ == "__main__":
     player = Player("M12", "Martin", "M", 2870, "1979-02-14", "", "021-123456")

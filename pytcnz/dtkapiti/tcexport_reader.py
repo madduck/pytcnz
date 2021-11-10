@@ -23,6 +23,7 @@ class TCExportReader(DataSource):
         *,
         add_players_to_draws=False,
         add_games_to_draws=False,
+        add_players_to_games=False,
         autoflip_scores=False,
         Draw_class=None,
         Game_class=None,
@@ -32,6 +33,7 @@ class TCExportReader(DataSource):
         self.__open_book(filename)
         self.__add_players_to_draws = add_players_to_draws
         self.__add_games_to_draws = add_games_to_draws
+        self.__add_players_to_games = add_players_to_games
         self.__autoflip_scores = autoflip_scores
         super().__init__(
             Player_class=Player_class or Player,
@@ -101,15 +103,23 @@ class TCExportReader(DataSource):
             self.__add_player_to_draw(player)
 
     def read_games(self, *, colmap=None, autoflip_scores=None, **kwargs):
-        postprocess = None
+        preprocess, postprocess = None, None
+
+        if self.__add_players_to_games:
+            if not self.players:
+                raise DataSource.DataUnavailableError(
+                    "add_players_to_games: Players have not been read"
+                )
+
+            preprocess = lambda g: self.__replace_player_names_with_records(g)
+
         if self.__add_games_to_draws:
             if not self.draws:
                 raise DataSource.DataUnavailableError(
                     "add_games_to_draws: Draws have not been read"
                 )
 
-            def postprocess(g):
-                self.__add_game_to_draw(g)
+            postprocess = lambda g: self.__add_game_to_draw(g)
 
         autoflip_scores = (
             autoflip_scores
@@ -123,6 +133,7 @@ class TCExportReader(DataSource):
             rows.colnames,
             rows,
             colmap=colmap,
+            preprocess=preprocess,
             postprocess=postprocess,
             autoflip_scores=autoflip_scores,
             **kwargs
@@ -131,10 +142,24 @@ class TCExportReader(DataSource):
     def __add_game_to_draw(self, game):
         self.draws[game.draw.name].add_game(game)
 
+    def __replace_player_names_with_records(self, gamedata):
+        for p in (1,2):
+            if player := gamedata[f'player{p}']:
+                gamedata[f'player{p}'] = self.players[player]
+
     def add_games_to_draws(self):
         if not self.draws:
             raise DataSource.DataUnavailableError(
                 "add_games_to_draws: Draws have not been read"
+            )
+
+        for game in self.games.values():
+            self.__add_game_to_draw(game)
+
+    def add_players_to_games(self):
+        if not self.players:
+            raise DataSource.DataUnavailableError(
+                "add_players_to_games: Players have not been read"
             )
 
         for game in self.games.values():

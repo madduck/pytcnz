@@ -26,6 +26,7 @@ class Game(BaseGame):
         pass
 
     class Status(enum.IntEnum):
+        notplayed = -2
         played = -1
         justfinished = 0
         on = 1
@@ -100,10 +101,10 @@ class Game(BaseGame):
         player1 = player1 or Game.Reference(from1)
         player2 = player2 or Game.Reference(from2)
 
-        data["status"] = Game.Status.from_int(int(status))
+        status = Game.Status.from_int(int(status))
 
         scores = None
-        if data["status"] <= Game.Status.justfinished:
+        if status <= Game.Status.justfinished:
             if isinstance(player1, Game.Reference) or isinstance(
                 player2, Game.Reference
             ):
@@ -112,21 +113,30 @@ class Game(BaseGame):
                 )
 
             if not (score1 ^ score2):
-                # TODO if a player defaults and the "Default" tick is set for
-                # that player, TournamentControl will propagate the result to
-                # subsequent rounds, and mark each game status=-1 for the
-                # player, but the game scores will be both 0.
-                #
-                # Maybe the solution is to use Placeholders for the players
-                # too, and if they have been set, then we can access the
-                # default=='Y' attribute and act accordingly.
-                #
-                # This might also be the way to go about BYEs.
-                #
-                # See also: test_game_with_defaulted_player
-                raise Game.InconsistentResultError(
-                    f"Game {name} needs exactly one winner"
-                )
+                try:
+                    if (
+                        str(player1).lower() == "bye"
+                        or player1.has_defaulted()
+                    ):
+                        score2 = 1
+                        status = Game.Status.notplayed
+                except AttributeError:
+                    pass
+
+                try:
+                    if (
+                        str(player2).lower() == "bye"
+                        or player2.has_defaulted()
+                    ):
+                        score1 = 1
+                        status = Game.Status.notplayed
+                except AttributeError:
+                    pass
+
+                if status != Game.Status.notplayed:
+                    raise Game.InconsistentResultError(
+                        f"Game {name} needs exactly one winner"
+                    )
 
             try:
                 scores, unparsed = Scores.from_string(data["comment"])
@@ -153,8 +163,13 @@ class Game(BaseGame):
                     f"While reading scores for game {name}: {e}"
                 )
 
-        data["scores"] = scores
-        data["datetime"] = None
+        data |= dict(
+            scores=scores,
+            score1=score1,
+            score2=score2,
+            status=status,
+            datetime=None,
+        )
 
         datetime = data.get("daytime")
         if datetime:
@@ -220,14 +235,26 @@ class Game(BaseGame):
             return self.name
 
     def is_scheduled(self):
-        return self.get("datetime") is not None and not self.is_played()
+        return self.get("datetime") is not None and not self.is_finished()
 
     def is_played(self):
-        return self.get_scores() is not None
+        return self.get_scores() is not None and self.status in (
+            Game.Status.played,
+            Game.Status.justfinished,
+        )
+
+    def is_finished(self):
+        return self.status <= Game.Status.justfinished
 
     def get_winner(self):
         if self.is_played():
             return self.players[self.scores.winner]
+        elif self.is_finished():
+            return (
+                self.players[0]
+                if self.score1 > self.score2
+                else self.players[1]
+            )
         else:
             return None
 

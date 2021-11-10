@@ -8,7 +8,9 @@ import pytest
 
 from pytcnz.scores import Scores
 from pytcnz.dtkapiti.game import Game
+from pytcnz.dtkapiti.player import Player
 from .test_game import make_game_data
+from .test_dtkapiti_player import make_player_data
 
 
 @pytest.fixture
@@ -161,9 +163,26 @@ def test_fancy_game_name_round3_8draw(game_data):
     assert final.get_fancy_name(drawsize=8) == "Championship Final"
 
 
-@pytest.mark.xfail  # TODO expected to fail until we resolve BYE/defaults
 def test_game_with_defaulted_player(game_data):
-    g = Game(**game_data | dict(status=-1))
+    Game(
+        **game_data
+        | dict(
+            status=-1, player1=Player(**make_player_data() | dict(default="Y"))
+        )
+    )
+
+
+def test_game_with_literal_bye(game_data):
+    Game(**game_data | dict(status=-1, player1="Bye"))
+
+
+@pytest.fixture
+def defaulted_game(game_data):
+    return Game(**game_data | dict(status=-1, player1="Bye"))
+
+
+def test_game_default_winner(defaulted_game):
+    assert defaulted_game.get_winner() == defaulted_game.players[1]
 
 
 def test_is_scheduled(game):
@@ -172,3 +191,11 @@ def test_is_scheduled(game):
 
 def test_is_played(played_game):
     assert played_game.is_played()
+
+
+def test_played_is_finished(played_game):
+    assert played_game.is_finished()
+
+
+def test_defaulted_is_finished(defaulted_game):
+    assert defaulted_game.is_finished()
