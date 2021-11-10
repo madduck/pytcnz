@@ -776,7 +776,7 @@ class iSquashController:
         self.driver.switch_to.alert.accept()
 
         msg = self.driver.find_element(
-            By.XPATH, '//*[@id="j_idt157"]/div/ul/li/span'
+            By.XPATH, "//*//*[contains(@class, 'ui-messages')]/div/ul/li/span"
         )
         print(msg.text, file=sys.stderr)
 
