@@ -678,7 +678,9 @@ class iSquashController:
             'input[@value="Update Web Diagram"]',
         ).click()
 
-    def go_enter_results_for_draw(self, draw, *, done=None, reset=False):
+    def go_enter_results_for_draw(
+        self, draw, *, games=None, done=None, reset=False
+    ):
         self.go_design_tournament()
 
         rowx, row = self.get_row_for_draw(draw)
@@ -699,7 +701,7 @@ class iSquashController:
 
         done = done or []
         entered = []
-        for game in draw.get_games():
+        for game in games or draw.games:
             if game in done:
                 print(f"    skip: {game!r}", file=sys.stderr)
                 continue
