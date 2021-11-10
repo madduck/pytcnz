@@ -473,6 +473,7 @@ class iSquashController:
             )
 
         elif self.state == self.State.managing:
+            self.driver.refresh()
             return
 
         self.driver.find_element(
