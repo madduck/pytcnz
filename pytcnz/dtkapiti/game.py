@@ -98,8 +98,18 @@ class Game(BaseGame):
             draw_name = md.get("draw")
         data = kwargs | dict(draw=Placeholder(name=draw_name))
 
-        player1 = player1 or Game.Reference(from1)
-        player2 = player2 or Game.Reference(from2)
+        def set_player(player, fromgame):
+            if player:
+                try:
+                    if player.get('name'):
+                        return player
+                except AttributeError:
+                    return Placeholder(name=player)
+            else:
+                return Game.Reference(fromgame)
+
+        player1 = set_player(player1, from1)
+        player2 = set_player(player2, from2)
 
         status = Game.Status.from_int(int(status))
 

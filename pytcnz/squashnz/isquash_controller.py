@@ -735,7 +735,7 @@ class iSquashController:
 
             for player in (0, 1):
                 isqname = row.find_all("td")[2 + player].text
-                pname = game.players[player]
+                pname = game.players[player].name
                 for name in pname.split():
                     if name.lower() not in isqname.lower():
                         raise iSquashController.PlayerNameMismatchError(
