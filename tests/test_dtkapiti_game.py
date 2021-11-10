@@ -73,9 +73,13 @@ def test_played_no_winner(game_data):
         Game(**game_data | dict(status=0))
 
 
-def test_scores_parsed(played_game_data):
-    g = Game(**played_game_data)
-    assert isinstance(g.scores, Scores)
+@pytest.fixture
+def played_game(played_game_data):
+    return Game(**played_game_data)
+
+
+def test_scores_parsed(played_game):
+    assert isinstance(played_game.scores, Scores)
 
 
 def test_scores_parsed_comment(played_game_data):
@@ -87,9 +91,8 @@ def test_scores_parsed_comment(played_game_data):
     assert g.comment == c
 
 
-def test_scores_parsed_no_comment(played_game_data):
-    g = Game(**played_game_data)
-    assert g.comment == ""
+def test_scores_parsed_no_comment(played_game):
+    assert played_game.comment == ""
 
 
 def test_inconsistent_no_winner(played_game_data):
@@ -161,3 +164,11 @@ def test_fancy_game_name_round3_8draw(game_data):
 @pytest.mark.xfail  # TODO expected to fail until we resolve BYE/defaults
 def test_game_with_defaulted_player(game_data):
     g = Game(**game_data | dict(status=-1))
+
+
+def test_is_scheduled(game):
+    assert game.is_scheduled()
+
+
+def test_is_played(played_game):
+    assert played_game.is_played()
