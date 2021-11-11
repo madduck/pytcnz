@@ -775,6 +775,13 @@ class iSquashController:
         self.driver.find_element(
             By.XPATH, '//*[@id="myForm"]/input[@value="Save"]'
         ).click()
+
+        wait = WebDriverWait(self.driver, 10)
+        wait.until(
+            expected_conditions.presence_of_element_located(
+                (By.ID, "drawForm")
+            )
+        )
         self.state = self.State.managing
 
         return entered
