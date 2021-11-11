@@ -702,7 +702,7 @@ class iSquashController:
         tbody = soup.find("table", class_="stats_table").find("tbody")
 
         done = done or []
-        entered = []
+        entered, failed = [], []
         for game in games or draw.games:
             if game in done:
                 print(f"    skip: {game!r}", file=sys.stderr)
@@ -717,15 +717,20 @@ class iSquashController:
                     f"Game {game.name} not in {row}"
                 )
 
-            for player in (0, 1):
-                isqname = row.find_all("td")[2 + player].text
-                pname = game.players[player].name
-                for name in pname.split():
-                    if name.lower() not in isqname.lower():
-                        raise iSquashController.PlayerNameMismatchError(
-                            f"While entering results for {game}: "
-                            f"{pname} is not {isqname}"
-                        )
+            try:
+                for player in (0, 1):
+                    isqname = row.find_all("td")[2 + player].text
+                    pname = game.players[player].name
+                    for name in pname.split():
+                        if name.lower() not in isqname.lower():
+                            raise iSquashController.PlayerNameMismatchError(
+                                f"{pname} is not {isqname}"
+                            )
+            except iSquashController.PlayerNameMismatchError as e:
+                Warnings.add(e, context=f"Entering results for {game.name}")
+                failed.append(game)
+                print(f"    fail: {game!r} Name mismatch: {e}", file=sys.stderr)
+                continue
 
             played = self.driver.find_element(
                 By.XPATH,
@@ -784,7 +789,7 @@ class iSquashController:
         )
         self.state = self.State.managing
 
-        return entered
+        return entered, failed
 
     def go_send_to_gradinglist(self):
         self.go_design_tournament()
