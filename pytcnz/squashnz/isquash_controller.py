@@ -736,15 +736,18 @@ class iSquashController:
                 By.XPATH,
                 f"//*[@id='myForm']/table/tbody/tr[{rowx+1}]/td[2]/select",
             )
-            if game.is_played():
+            if reset:
                 Select(played).select_by_value("Played")
-                scores = game.scores
+                scores = [(0, 0),] * 5
+            elif game.is_played():
+                Select(played).select_by_value("Played")
+                scores = list(game.scores)
             else:
                 Select(played).select_by_value("NotPlayed")
                 if game.get_winner() == game.players[0]:
-                    scores = Scores(((11, 0), (11, 0), (11, 0)))
+                    scores = [(11, 0),] * 3
                 else:
-                    scores = Scores(((0, 11), (0, 11), (0, 11)))
+                    scores = [(0, 11),] * 3
 
             if scores:
                 tr_xpath = f"//*[@id='myForm']/table/tbody/tr[{rowx}]"
@@ -762,7 +765,6 @@ class iSquashController:
                 else:
                     print(f"          {game!r}", file=sys.stderr)
 
-                scores = list(scores) if not reset else list()
                 for i in range(len(scores), 5):
                     scores.append((0, 0))
 
