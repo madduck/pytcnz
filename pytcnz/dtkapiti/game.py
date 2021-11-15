@@ -35,6 +35,7 @@ class Game(BaseGame):
         scheduled = 99
         unknown = 100
         invalid = 101
+        error = 102
 
         @classmethod
         def from_int(cls, _int):
@@ -148,30 +149,24 @@ class Game(BaseGame):
                         f"Game {name} needs exactly one winner"
                     )
 
-            try:
-                scores, unparsed = Scores.from_string(data["comment"])
-                if scores:
-                    data["comment"] = unparsed
+            scores, unparsed = Scores.from_string(data["comment"])
+            if scores:
+                data["comment"] = unparsed
 
-                    if (scores.winner == Scores.Player.A and score2) or (
-                        scores.winner == Scores.Player.B and score1
-                    ):
-                        if autoflip_scores:
-                            Warnings.add(
-                                f"Scores recorded in wrong order: {scores}",
-                                context=f"Reading game {name}",
-                            )
-                            scores.flip_scores()
-                        else:
-                            r = "-".join(map(str, (score1, score2)))
-                            raise Game.InconsistentResultError(
-                                f"Scores don't match result {r}: {scores}"
-                            )
-
-            except Scores.BaseException as e:
-                raise Game.ReadError(
-                    f"While reading scores for game {name}: {e}"
-                )
+                if (scores.winner == Scores.Player.A and score2) or (
+                    scores.winner == Scores.Player.B and score1
+                ):
+                    if autoflip_scores:
+                        Warnings.add(
+                            f"Scores recorded in wrong order: {scores}",
+                            context=f"Reading game {name}",
+                        )
+                        scores.flip_scores()
+                    else:
+                        r = "-".join(map(str, (score1, score2)))
+                        raise Game.InconsistentResultError(
+                            f"Scores don't match result {r}: {scores}"
+                        )
 
         data |= dict(
             scores=scores,
