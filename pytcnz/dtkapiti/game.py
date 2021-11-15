@@ -102,7 +102,7 @@ class Game(BaseGame):
         def set_player(player, fromgame):
             if player:
                 try:
-                    if player.get('name'):
+                    if player.get("name"):
                         return player
                 except AttributeError:
                     return Placeholder(name=player)
