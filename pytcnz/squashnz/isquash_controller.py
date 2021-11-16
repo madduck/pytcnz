@@ -705,7 +705,10 @@ class iSquashController:
         entered, failed = [], []
         for game in games or draw.games:
             if game in done:
-                print(f"    skip: {game!r}", file=sys.stderr)
+                print(f"    prev: {game!r}", file=sys.stderr)
+                continue
+            elif not game.is_finished():
+                print(f"    pend: {game!r}", file=sys.stderr)
                 continue
 
             rowx, row = iSquashController.find_row_by_col_content(
@@ -724,7 +727,11 @@ class iSquashController:
             if scorecell1.get_attribute("disabled"):
                 # iSquash is not ready to receive our scores yet, whether we
                 # have them or not.
-                print(f"    skip: {game!r}", file=sys.stderr)
+                if game.is_played():
+                    print(f"    skip: {game!r}", file=sys.stderr)
+                else:
+                    print(f"     bye: {game!r}", file=sys.stderr)
+                    entered.append(game)
                 continue
 
             try:
@@ -763,7 +770,7 @@ class iSquashController:
                 if reset:
                     print(f"    rset: {game!r}", file=sys.stderr)
                 else:
-                    print(f"          {game!r}", file=sys.stderr)
+                    print(f"    done: {game!r}", file=sys.stderr)
 
                 for i in range(len(scores), 5):
                     scores.append((0, 0))
