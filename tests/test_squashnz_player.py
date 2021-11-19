@@ -67,6 +67,24 @@ def test_player_age_no_dob(player):
     assert player.age_group == Player.AgeGroup.Unknown
 
 
+def test_player_get_age_no_dob(player):
+    player = Player(**make_player_data(dob=None))
+    assert player.get_age() is None
+    assert player.get_age_group() == Player.AgeGroup.Unknown
+
+
+def test_player_age_dob_emptystring(player):
+    player = Player(**make_player_data(dob=""))
+    assert player.age is None
+    assert player.age_group == Player.AgeGroup.Unknown
+
+
+def test_player_get_age_dob_emptystring(player):
+    player = Player(**make_player_data(dob=""))
+    assert player.get_age() is None
+    assert player.get_age_group() == Player.AgeGroup.Unknown
+
+
 def test_player_age_group_junior(player_data):
     player = Player(**player_data | dict(grade="J1"))
     assert player.age_group == Player.AgeGroup.Junior

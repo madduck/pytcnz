@@ -104,17 +104,25 @@ class Player(PlayerBase):
     @classmethod
     def get_age_for_dob(cls, dob, *, onday=None):
         onday = onday or date.today()
-        return (
-            onday.year
-            - dob.year
-            - ((onday.month, onday.day) < (dob.month, dob.day))
-        )
+        age = None
+        try:
+            age = (
+                onday.year
+                - dob.year
+                - ((onday.month, onday.day) < (dob.month, dob.day))
+            )
+        except AttributeError:
+            pass
+        finally:
+            return age
 
     def get_age(self, *, onday=None):
         return Player.get_age_for_dob(self.dob, onday=onday)
 
     @classmethod
     def get_age_group_for_age(cls, age):
+        if not age:
+            return Player.AgeGroup.Unknown
         for th in list(Player.AgeGroup):
             if age >= th:
                 return th
