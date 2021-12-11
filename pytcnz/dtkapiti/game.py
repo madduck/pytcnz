@@ -33,9 +33,10 @@ class Game(BaseGame):
         next = 2
         soon = 3
         scheduled = 99
-        unknown = 100
-        invalid = 101
-        error = 102
+        elsewhere = 100
+        unknown = 101
+        invalid = 102
+        error = 103
 
         @classmethod
         def from_int(cls, _int):
