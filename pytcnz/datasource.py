@@ -22,7 +22,9 @@ class DataSource:
         pass
 
     class ReadError(BaseException):
-        pass
+        def __init__(self, context, exc):
+            self.exc = exc
+            super().__init__(f"While {context.lower()}: {exc}")
 
     def __init__(
         self,
@@ -155,7 +157,7 @@ class DataSource:
                 **kwargs,
             )
         except BaseException as e:
-            raise DataSource.ReadError(f"While reading players: {e}")
+            raise DataSource.ReadError("Reading players", e)
 
     def read_draws(
         self,
@@ -181,7 +183,7 @@ class DataSource:
                 **kwargs,
             )
         except BaseException as e:
-            raise DataSource.ReadError(f"While reading draws: {e}")
+            raise DataSource.ReadError("Reading draws", e)
 
     def read_games(
         self,
@@ -207,7 +209,7 @@ class DataSource:
                 **kwargs,
             )
         except BaseException as e:
-            raise DataSource.ReadError(f"While reading games: {e}")
+            raise DataSource.ReadError("Reading games", e)
 
     def read_all(
         self, *, draws_colmap=None, players_colmap=None, games_colmap=None
