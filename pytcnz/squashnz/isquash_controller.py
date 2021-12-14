@@ -261,23 +261,33 @@ class iSquashController:
         self.tcode = tournament_code
         self.state = self.State.pre_tournament
 
-    def go_pre_tournament(self):
+    def go_pre_tournament(self, sub=None):
         if self.state < self.State.logged_in:
             raise iSquashController.OutOfSequenceError(
                 self, self.State.pre_tournament
             )
 
-        elif self.state == self.State.pre_tournament:
-            return
+        elif self.state != self.State.pre_tournament:
+            self.driver.find_element(
+                By.XPATH, "//input[@value='Pre Tournament']"
+            ).click()
 
-        self.driver.find_element(
-            By.XPATH, "//input[@value='Pre Tournament']"
-        ).click()
+            self.state = self.State.pre_tournament
 
-        self.state = self.State.pre_tournament
+        if sub:
+            self.driver.find_element(
+                By.XPATH, f"//input[@value='{sub}']"
+            ).click()
+
+            wait = WebDriverWait(self.driver, 10)
+            wait.until(
+                expected_conditions.visibility_of_element_located(
+                    (By.XPATH, "//table[contains(@class, 'stats_table')]")
+                )
+            )
 
     def go_clear_registrations(self, player_cb=None):
-        self.go_pre_tournament()
+        self.go_pre_tournament("List Registrations")
 
         self.driver.find_element(
             By.XPATH, "//input[@value='List Registrations']"
@@ -319,11 +329,7 @@ class iSquashController:
             pass
 
     def go_fill_registrations(self, players, *, update=False, player_cb=None):
-        self.go_pre_tournament()
-
-        self.driver.find_element(
-            By.XPATH, "//input[@value='List Registrations']"
-        ).click()
+        self.go_pre_tournament("List Registrations")
 
         to_register = []
         for player in players:
@@ -485,11 +491,8 @@ class iSquashController:
         self.state = self.State.managing
 
     def go_seed_tournament(self):
-        self.go_pre_tournament()
+        self.go_pre_tournament("Seed Tournament")
 
-        self.driver.find_element(
-            By.XPATH, "//input[@value='Seed Tournament']"
-        ).click()
         self.state = self.State.tseeding
 
         self.driver.find_element(
