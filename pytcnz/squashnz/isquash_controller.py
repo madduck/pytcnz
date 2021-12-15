@@ -759,12 +759,16 @@ class iSquashController:
             if reset:
                 Select(played).select_by_value("Played")
                 scores = [(0, 0),] * 5
-            elif game.is_played():
-                Select(played).select_by_value("Played")
-                scores = list(game.scores)
+
             else:
-                Select(played).select_by_value("NotPlayed")
-                if game.get_winner() == game.players[0]:
+                if game.is_played():
+                    Select(played).select_by_value("Played")
+                else:
+                    Select(played).select_by_value("NotPlayed")
+
+                if game.scores:
+                    scores = list(game.scores)
+                elif game.get_winner() == game.players[0]:
                     scores = [(11, 0),] * 3
                 else:
                     scores = [(0, 11),] * 3
