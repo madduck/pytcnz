@@ -244,7 +244,7 @@ class Game(BaseGame):
         return self.get("datetime") is not None and not self.is_finished()
 
     def is_played(self):
-        return self.get_scores() is not None and self.status in (
+        return self.status in (
             Game.Status.played,
             Game.Status.justfinished,
         )
@@ -253,9 +253,7 @@ class Game(BaseGame):
         return self.status <= Game.Status.justfinished
 
     def get_winner(self):
-        if self.is_played():
-            return self.players[self.scores.winner]
-        elif self.is_finished():
+        if self.is_finished():
             return (
                 self.players[0]
                 if self.score1 > self.score2

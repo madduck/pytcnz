@@ -199,3 +199,12 @@ def test_played_is_finished(played_game):
 
 def test_defaulted_is_finished(defaulted_game):
     assert defaulted_game.is_finished()
+
+
+@pytest.fixture
+def played_game_no_scores(game_data):
+    return Game(**game_data | dict(status=0, score1=1))
+
+
+def test_played_no_scores_is_played(played_game_no_scores):
+    assert played_game_no_scores.is_played()
