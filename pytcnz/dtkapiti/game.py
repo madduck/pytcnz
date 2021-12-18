@@ -150,24 +150,30 @@ class Game(BaseGame):
                         f"Game {name} needs exactly one winner"
                     )
 
-            scores, unparsed = Scores.from_string(data["comment"])
-            if scores:
-                data["comment"] = unparsed
+            try:
+                scores, unparsed = Scores.from_string(data["comment"])
+                if scores:
+                    data["comment"] = unparsed
 
-                if (scores.winner == Scores.Player.A and score2) or (
-                    scores.winner == Scores.Player.B and score1
-                ):
-                    if autoflip_scores:
-                        Warnings.add(
-                            f"Scores recorded in wrong order: {scores}",
-                            context=f"Reading game {name}",
-                        )
-                        scores.flip_scores()
-                    else:
-                        r = "-".join(map(str, (score1, score2)))
-                        raise Game.InconsistentResultError(
-                            f"Scores don't match result {r}: {scores}"
-                        )
+                    if (scores.winner == Scores.Player.A and score2) or (
+                        scores.winner == Scores.Player.B and score1
+                    ):
+                        if autoflip_scores:
+                            Warnings.add(
+                                f"Scores recorded in wrong order: {scores}",
+                                context=f"Reading game {name}",
+                            )
+                            scores.flip_scores()
+                        else:
+                            r = "-".join(map(str, (score1, score2)))
+                            raise Game.InconsistentResultError(
+                                f"Scores of game {name} don't match result {r}: {scores}"
+                            )
+
+            except Scores.IncompleteError as e:
+                raise Game.InconsistentResultError(
+                    f"Error parsing scores for game {name}: {e}"
+                )
 
         data |= dict(
             scores=scores,

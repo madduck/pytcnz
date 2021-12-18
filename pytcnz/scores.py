@@ -17,9 +17,6 @@ class Scores:
     class BaseException(BaseException):
         pass
 
-    class InvalidError(BaseException):
-        pass
-
     class IncompleteError(BaseException):
         pass
 
