@@ -76,15 +76,16 @@ class Scores:
         self.__verify_scores()
 
     def __verify_scores(self):
-        min_games, max_games = int(min(self.bestof) / 2 + 1), max(self.bestof)
+        min_games = [int(cnt / 2 + 1) for cnt in self.bestof]
+        max_games = self.bestof
 
-        if len(self._sets) < min_games:
+        if len(self._sets) < min(min_games):
             raise Scores.IncompleteError(
-                f"At least {min_games} sets must be played"
+                f"At least {min(min_games)} sets must be played"
             )
-        elif len(self._sets) > max_games:
+        elif len(self._sets) > max(max_games):
             raise Scores.IncompleteError(
-                f"At most {max_games} sets can be played"
+                f"At most {max(max_games)} sets can be played"
             )
 
         cntA, cntB = 0, 0
@@ -113,15 +114,14 @@ class Scores:
         if cntA == cntB:
             raise Scores.IncompleteError(f"No winner at {cntA}-{cntB}")
 
-        if cntA == 0 or cntB == 0:
-            if cntA == max_games:
-                raise Scores.IncompleteError(
-                    f"Cannot win {max_games}-0 in best-of {self.bestof}"
-                )
-            elif cntB == max_games:
-                raise Scores.IncompleteError(
-                    f"Cannot lose 0-{max_games} in best-of {self.bestof}"
-                )
+        if cntA == 0 and cntB not in min_games:
+            raise Scores.IncompleteError(
+                f"Cannot lose 0-{cntB} in best-of {self.bestof}"
+            )
+        elif cntB == 0 and cntA not in min_games:
+            raise Scores.IncompleteError(
+                f"Cannot win {cntA}-0 in best-of {self.bestof}"
+            )
 
         for i, (a, b) in enumerate(self._sets, 1):
             if (a > b and a < maxpar) or (b > a and b < maxpar):
