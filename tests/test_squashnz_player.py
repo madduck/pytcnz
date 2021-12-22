@@ -18,6 +18,8 @@ PLAYER = PLAYER | dict(
     phone="043841234",
     mobile="021234567",
     email="jane.doe@example.org",
+    vaccinated="X",
+    vaccination_expiry="30-Dec-2099",
     comment="player comment",
 )
 
@@ -144,9 +146,43 @@ def test_first_name_extraction(name_and_firstname):
 
 def test_equality_ignores_id(player_data):
     p1 = Player(**player_data)
-    p2 = Player(**player_data | dict(id='foo'))
+    p2 = Player(**player_data | dict(id="foo"))
     assert p1 == p2
 
 
 def test_single_word_name(player_data):
     p = Player(**player_data | dict(name="Bye"))
+
+
+def test_vaccination_status(player):
+    assert player.is_vaccinated() == Player.VaccinationStatus.V
+
+
+def test_vaccination_status_bool(player):
+    assert player.is_vaccinated()
+
+
+def test_vaccination_status_no_expiry_bool(player_data):
+    p = Player(**player_data | dict(vaccination_expiry=""))
+    assert not p.is_vaccinated()
+
+
+def test_vaccination_status_expired(player):
+    assert (
+        player.is_vaccinated(onday=date(2099, 12, 31))
+        == Player.VaccinationStatus.E
+    )
+
+
+def test_vaccination_status_expired_bool(player):
+    assert not player.is_vaccinated(onday=date(2099, 12, 31))
+
+
+def test_unvaccinated_player(player_data):
+    p = Player(**player_data | dict(vaccinated=""))
+    assert p.is_vaccinated() == Player.VaccinationStatus.N
+
+
+def test_unvaccinated_player_bool(player_data):
+    p = Player(**player_data | dict(vaccinated=""))
+    assert not p.is_vaccinated()

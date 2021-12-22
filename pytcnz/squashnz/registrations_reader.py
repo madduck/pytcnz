@@ -21,6 +21,9 @@ class RegistrationsReader(DataSource):
     def read_players(self, *, colmap=None, **kwargs):
         colmap = colmap or {}
 
+        # handle a typo in the iSquash registrations export:
+        colmap["vaccation_expiry"] = "vaccination_expiry"
+
         def preprocess(data):
             data["id"] = data[""]
             del data[""]

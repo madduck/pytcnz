@@ -16,7 +16,6 @@ from .grading import SquashNZGrading
 
 
 class Player(PlayerBase):
-
     class InvalidPhoneNumber(InvalidDataError):
         pass
 
@@ -29,6 +28,20 @@ class Player(PlayerBase):
         def __str__(self):
             return self.name
 
+    class VaccinationStatus(enum.Enum):
+        V = "Vaccinated"
+        E = "Vax expired"
+        N = "Not vaccinated"
+
+        def __str__(self):
+            return self.value
+
+        def __repr__(self):
+            return self.name
+
+        def __bool__(self):
+            return self.name == "V"
+
     def __init__(
         self,
         *,
@@ -37,6 +50,8 @@ class Player(PlayerBase):
         gender,
         grade=None,
         dob=None,
+        vaccinated=None,
+        vaccination_expiry=None,
         onday=None,
         strict=True,
         **kwargs,
@@ -64,6 +79,20 @@ class Player(PlayerBase):
             points, gender, age_group == Player.AgeGroup.Junior
         )
 
+        if vaccination_expiry:
+            try:
+                vaccination_expiry.strftime("")
+            except AttributeError:
+                vaccination_expiry = dateutil.parser.parse(
+                    vaccination_expiry, dayfirst=True
+                )
+
+            vaxxed = Player.get_vaccinated_status(
+                vaccinated, vaccination_expiry
+            )
+        else:
+            vaxxed = Player.VaccinationStatus.N
+
         data.update(
             first_name=first_name,
             points=grading.points,
@@ -72,6 +101,9 @@ class Player(PlayerBase):
             age_group=age_group,
             age=age,
             dob=dob,
+            vaccinated=vaccinated,
+            vaccination_expiry=vaccination_expiry,
+            vaxxed=vaxxed,
         )
 
         for nr in ("phone", "mobile"):
@@ -90,7 +122,8 @@ class Player(PlayerBase):
 
     def __repr__(self):
         return (
-            f"<{self.__class__.__name__}({self.name} ({self.age_group}) "
+            f"<{self.__class__.__name__}({self.name} ({self.age_group}"
+            f", {self.vaxxed!r}) "
             f"{self.grade} @ {self.points:,d} pts)>"
         )
 
@@ -130,6 +163,26 @@ class Player(PlayerBase):
     def get_age_group(self, *, onday=None):
         age = self.get_age(onday=onday)
         return Player.get_age_group_for_age(age)
+
+    @classmethod
+    def get_vaccinated_status(
+        self, vaccinated, vaccination_expiry, *, onday=None
+    ):
+        if not vaccinated or not vaccination_expiry:
+            return Player.VaccinationStatus.N
+        else:
+            onday = onday or date.today()
+            return (
+                Player.VaccinationStatus.V
+                if vaccination_expiry.date() >= onday
+                else Player.VaccinationStatus.E
+            )
+
+
+    def is_vaccinated(self, *, onday=None):
+        return Player.get_vaccinated_status(
+            self.vaccinated, self.vaccination_expiry, onday=onday
+        )
 
     SALUTATIONS = ("Mr", "Mrs", "Ms", "Miss", "Dr")
 
