@@ -504,7 +504,7 @@ class iSquashController:
         wait.until(expected_conditions.alert_is_present())
         self.driver.switch_to.alert.accept()
 
-    def _go_extract_spreadsheet(self, filename, btndict):
+    def _go_extract_spreadsheet(self, filename, btnlabel):
         self.go_design_tournament()
 
         form = self.driver.find_element(By.ID, "toolbarForm")
@@ -513,6 +513,14 @@ class iSquashController:
             By.ID, "j_id1:javax.faces.ViewState:0"
         )
         jsessionid = self.driver.get_cookie("JSESSIONID")
+
+        btn = self.driver.find_element(
+            By.XPATH,
+            '//*[@id="toolbarForm"]/div/div[2]'
+            f'/input[@value="{btnlabel}"]',
+        )
+        btndict = { btn.get_attribute("name") : btnlabel }
+
         response = requests.post(
             urljoin(self.driver.current_url, form.get_attribute("action")),
             data=btndict
@@ -530,12 +538,12 @@ class iSquashController:
 
     def go_extract_registrations(self, filename):
         self._go_extract_spreadsheet(
-            filename, {"toolbarForm:j_idt145": "Extract Registrations"}
+            filename, "Extract Registrations"
         )
 
     def go_extract_draws(self, filename):
         self._go_extract_spreadsheet(
-            filename, {"toolbarForm:j_idt147": "Extract Draws"}
+            filename, "Extract Draws"
         )
 
     def go_delete_draws(self, draws=None, *, draw_cb=None):
