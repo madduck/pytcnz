@@ -42,7 +42,7 @@ class Player(BasePlayer):
                 if number:
                     data[nr] = PhoneNumber(str(number))
             except PhoneNumber.InvalidPhoneNumber:
-                msg = f"{number} is not a valid phone number"
+                msg = f"{number} is not a valid phone number for player {name}"
                 if strict:
                     raise BasePlayer.InvalidPhoneNumber(msg)
                 else:
