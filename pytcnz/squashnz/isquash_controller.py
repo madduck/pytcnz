@@ -245,6 +245,7 @@ class iSquashController:
         soup = self.get_soup()
         tbody = soup.find(id="listTournamentEventsForm:tournaments_data")
 
+        tournament_code = tournament_code.upper()
         rowx, row = iSquashController.find_row_by_col_content(
             tbody, tournament_code
         )
