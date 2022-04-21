@@ -463,7 +463,7 @@ class iSquashController:
         )
         if add_btn.get_property("disabled"):
             msg = self.driver.find_element(
-                By.XPATH, '//*[@id="j_idt156"]/div/ul/li/span'
+                By.XPATH, "//*//*[contains(@class, 'ui-messages')]/div/ul/li/span"
             )
             if player_cb:
                 player_cb(player, added=False, error=True, msg=msg.text)
