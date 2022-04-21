@@ -360,6 +360,12 @@ class iSquashController:
                     By.ID, "makeTournamentRegistration:" "enterTournament"
                 ).click()
 
+            wait = WebDriverWait(self.driver, 10)
+            wait.until(
+                expected_conditions.presence_of_element_located(
+                    (By.ID, "listRegistrantsForm")
+                )
+            )
             if player_cb:
                 player_cb(player, False)
 
