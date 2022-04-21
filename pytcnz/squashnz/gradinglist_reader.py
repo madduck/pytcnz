@@ -354,13 +354,11 @@ def make_argument_parser(
     )
     searchg.add_argument(
         "--minpoints",
-        "-m",
         type=int,
         help="Only include players above this points limit (inclusive)",
     )
     searchg.add_argument(
         "--maxpoints",
-        "-x",
         type=int,
         help="Only include players below this points limit (inclusive)",
     )
