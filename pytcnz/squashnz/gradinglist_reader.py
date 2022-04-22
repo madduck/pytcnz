@@ -146,11 +146,10 @@ class GradingListReader(DataSource):
                     age=age,
                     grade=grade,
                 )
-                female.extend(ret['gradedPlayers1'])
-                male.extend(ret['gradedPlayers2'])
+                female.extend(ret["gradedPlayers1"])
+                male.extend(ret["gradedPlayers2"])
 
         return female, male
-
 
     def __get_isquash_records(
         self,
@@ -180,8 +179,10 @@ class GradingListReader(DataSource):
             male, female = [], []
             for club in self.clubs:
                 district = club[:2]
-                if False and district == 'WN':
-                    import ipdb; ipdb.set_trace()  # noqa:E402,E702
+                if False and district == "WN":
+                    import ipdb
+
+                    ipdb.set_trace()  # noqa:E402,E702
                 if (clubs and (club not in clubs)) or (
                     districts and (district not in districts)
                 ):
@@ -247,6 +248,7 @@ class GradingListReader(DataSource):
         points_max=None,
         colmap=None,
         sleep=0,
+        resolve_duplicate_cb=None,
     ):
 
         colmap = colmap or {}
@@ -274,7 +276,12 @@ class GradingListReader(DataSource):
         ):
             records.append([player[col] for col in colnames])
         records.sort(key=lambda r: r[5], reverse=True)
-        super().read_players(colnames, records, colmap=colmap)
+        super().read_players(
+            colnames,
+            records,
+            resolve_duplicate_cb=resolve_duplicate_cb,
+            colmap=colmap,
+        )
 
     def read_tournament_name(self):
         raise NotImplementedError(

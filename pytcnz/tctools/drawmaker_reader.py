@@ -49,7 +49,7 @@ class ReaderBase(DataSource):
         rows = self.__book["Info"]
         self.set_tournament_name(rows[3, 2])
 
-    def read_draws(self, *, colmap=None, **kwargs):
+    def read_draws(self, *, colmap=None, resolve_duplicate_cb=None, **kwargs):
         read = {}
         for gender, sheet in self.__get_player_sheets().items():
             firstrow = self.get_first_player_data_row(gender)
@@ -59,10 +59,16 @@ class ReaderBase(DataSource):
                     continue
                 read[d] = None
         super().read_draws(
-            ["name"], [[d] for d in read.keys()], colmap=colmap, **kwargs
+            ["name"],
+            [[d] for d in read.keys()],
+            colmap=colmap,
+            resolve_duplicate_cb=resolve_duplicate_cb,
+            **kwargs,
         )
 
-    def read_players(self, *, colmap=None, **kwargs):
+    def read_players(
+        self, *, colmap=None, resolve_duplicate_cb=None, **kwargs
+    ):
         postprocess = None
         if self.__add_players_to_draws:
             if not self.draws:
@@ -96,6 +102,7 @@ class ReaderBase(DataSource):
             colmap=colmap,
             preprocess=preprocess,
             postprocess=postprocess,
+            resolve_duplicate_cb=resolve_duplicate_cb,
             **kwargs,
         )
 
@@ -155,7 +162,9 @@ class DrawMakerReader(ReaderBase):
             **kwargs,
         )
 
-    def read_players(self, *, colmap=None, **kwargs):
+    def read_players(
+        self, *, colmap=None, resolve_duplicate_cb=None, **kwargs
+    ):
         colmap = (colmap or {}) | dict(
             name1="isquash_name",
             phone="phoneraw",
@@ -163,7 +172,9 @@ class DrawMakerReader(ReaderBase):
             mobile="mobileraw",
             mobnormal="mobile",
         )
-        super().read_players(colmap=colmap, **kwargs)
+        super().read_players(
+            colmap=colmap, resolve_duplicate_cb=resolve_duplicate_cb, **kwargs
+        )
 
     def get_player_sheet_name(self, gender):
         if gender == Gender.W:

@@ -28,7 +28,7 @@ class TCExportReader(DataSource):
         Draw_class=None,
         Game_class=None,
         Player_class=None,
-        **kwargs
+        **kwargs,
     ):
         self.__open_book(filename)
         self.__add_players_to_draws = add_players_to_draws
@@ -39,7 +39,7 @@ class TCExportReader(DataSource):
             Player_class=Player_class or Player,
             Draw_class=Draw_class or Draw,
             Game_class=Game_class or Game,
-            **kwargs
+            **kwargs,
         )
 
     def __open_book(self, filename):
@@ -60,12 +60,18 @@ class TCExportReader(DataSource):
         rows.name_rows_by_column(0)
         self.set_tournament_name(rows["Title", 0])
 
-    def read_draws(self, *, colmap=None, **kwargs):
+    def read_draws(self, *, colmap=None, resolve_duplicate_cb=None, **kwargs):
         rows = self.__book["Draws"]
         rows.name_columns_by_row(0)
-        super().read_draws(rows.colnames, rows, colmap=colmap, **kwargs)
+        super().read_draws(
+            rows.colnames,
+            rows,
+            colmap=colmap,
+            resolve_duplicate_cb=resolve_duplicate_cb,
+            **kwargs,
+        )
 
-    def read_players(self, *, colmap=None, **kwargs):
+    def read_players(self, *, colmap=None, resolve_duplicate_cb=None, **kwargs):
         postprocess = None
         if self.__add_players_to_draws:
             if not self.draws:
@@ -87,7 +93,8 @@ class TCExportReader(DataSource):
             rows,
             colmap=colmap,
             postprocess=postprocess,
-            **kwargs
+            resolve_duplicate_cb=resolve_duplicate_cb,
+            **kwargs,
         )
 
     def __add_player_to_draw(self, player):
@@ -102,7 +109,7 @@ class TCExportReader(DataSource):
         for player in self.players.values():
             self.__add_player_to_draw(player)
 
-    def read_games(self, *, colmap=None, autoflip_scores=None, **kwargs):
+    def read_games(self, *, colmap=None, autoflip_scores=None, resolve_duplicate_cb=None, **kwargs):
         preprocess, postprocess = None, None
 
         if self.__add_players_to_games:
@@ -136,16 +143,17 @@ class TCExportReader(DataSource):
             preprocess=preprocess,
             postprocess=postprocess,
             autoflip_scores=autoflip_scores,
-            **kwargs
+            resolve_duplicate_cb=resolve_duplicate_cb,
+            **kwargs,
         )
 
     def __add_game_to_draw(self, game):
         self.draws[game.draw.name].add_game(game)
 
     def __replace_player_names_with_records(self, gamedata):
-        for p in (1,2):
-            if player := gamedata[f'player{p}']:
-                gamedata[f'player{p}'] = self.players[player]
+        for p in (1, 2):
+            if player := gamedata[f"player{p}"]:
+                gamedata[f"player{p}"] = self.players[player]
 
     def add_games_to_draws(self):
         if not self.draws:

@@ -109,6 +109,7 @@ class DataSource:
         idcol="name",
         preprocess=None,
         postprocess=None,
+        resolve_duplicate_cb=None,
         **kwargs,
     ):
         colnames = cls.sanitise_colnames(colnames)
@@ -129,6 +130,9 @@ class DataSource:
             if postprocess:
                 postprocess(p)
 
+            if p[idcol] in target and resolve_duplicate_cb:
+                p = resolve_duplicate_cb(target[p[idcol]], p)
+
             target[p[idcol]] = p
 
         return colnames
@@ -141,6 +145,7 @@ class DataSource:
         colmap=None,
         preprocess=None,
         postprocess=None,
+        resolve_duplicate_cb=None,
         **kwargs,
     ):
         if self.players:
@@ -154,6 +159,7 @@ class DataSource:
                 colmap=colmap,
                 preprocess=preprocess,
                 postprocess=postprocess,
+                resolve_duplicate_cb=resolve_duplicate_cb,
                 **kwargs,
             )
         except BaseException as e:
@@ -167,6 +173,7 @@ class DataSource:
         colmap=None,
         preprocess=None,
         postprocess=None,
+        resolve_duplicate_cb=None,
         **kwargs,
     ):
         if self.draws:
@@ -180,6 +187,7 @@ class DataSource:
                 colmap=colmap,
                 preprocess=preprocess,
                 postprocess=postprocess,
+                resolve_duplicate_cb=resolve_duplicate_cb,
                 **kwargs,
             )
         except BaseException as e:
@@ -193,6 +201,7 @@ class DataSource:
         colmap=None,
         preprocess=None,
         postprocess=None,
+        resolve_duplicate_cb=None,
         **kwargs,
     ):
         if self.games:
@@ -206,6 +215,7 @@ class DataSource:
                 colmap=colmap,
                 preprocess=preprocess,
                 postprocess=postprocess,
+                resolve_duplicate_cb=resolve_duplicate_cb,
                 **kwargs,
             )
         except BaseException as e:

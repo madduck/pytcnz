@@ -118,6 +118,23 @@ def test_read_rows_other_idcol_sanitised(colnames, rows):
         assert set(target[row[3]].values()) == set(row)
 
 
+def test_read_rows_resolv_duplicate_callback(colnames, rows):
+    target = {}
+
+    fake_row = [33, 'three', '33', 'I am pretending to be three']
+    rows.append(fake_row)
+
+    def resolve_cb(existing, new):
+        # override default policy, which would be that new replaces old
+        return existing
+
+    DataSource.read_rows_into(target, colnames, rows, dict,
+                              resolve_duplicate_cb=resolve_cb)
+
+    # assert that new did not replace old
+    assert target['three'] != fake_row
+
+
 def test_read_rows_preprocess(colnames, rows):
     target = {}
     status = dict(preprocess=False)

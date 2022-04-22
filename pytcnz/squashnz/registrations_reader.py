@@ -18,7 +18,9 @@ class RegistrationsReader(DataSource):
         self.__filename = filename
         self.__book = pyexcel.get_book(file_name=filename)
 
-    def read_players(self, *, colmap=None, **kwargs):
+    def read_players(
+        self, *, colmap=None, resolve_duplicate_cb=None, **kwargs
+    ):
         colmap = colmap or {}
 
         def preprocess(data):
@@ -28,7 +30,12 @@ class RegistrationsReader(DataSource):
         rows = self.__book["Registrations"]
         rows.name_columns_by_row(0)
         super().read_players(
-            rows.colnames, rows, colmap=colmap, preprocess=preprocess, **kwargs
+            rows.colnames,
+            rows,
+            colmap=colmap,
+            preprocess=preprocess,
+            resolve_duplicate_cb=resolve_duplicate_cb,
+            **kwargs
         )
 
     def read_tournament_name(self):
