@@ -25,6 +25,7 @@ class TCExportReader(DataSource):
         add_games_to_draws=False,
         add_players_to_games=False,
         autoflip_scores=False,
+        drawnamepat=r"\w\d{1}",
         Draw_class=None,
         Game_class=None,
         Player_class=None,
@@ -35,6 +36,7 @@ class TCExportReader(DataSource):
         self.__add_games_to_draws = add_games_to_draws
         self.__add_players_to_games = add_players_to_games
         self.__autoflip_scores = autoflip_scores
+        self.__drawnamepat = drawnamepat
         super().__init__(
             Player_class=Player_class or Player,
             Draw_class=Draw_class or Draw,
@@ -97,6 +99,7 @@ class TCExportReader(DataSource):
             colmap=colmap,
             postprocess=postprocess,
             resolve_duplicate_cb=resolve_duplicate_cb,
+            drawnamepat=self.__drawnamepat,
             **kwargs,
         )
 
@@ -154,6 +157,7 @@ class TCExportReader(DataSource):
             postprocess=postprocess,
             autoflip_scores=autoflip_scores,
             resolve_duplicate_cb=resolve_duplicate_cb,
+            drawnamepat=self.__drawnamepat,
             **kwargs,
         )
 
