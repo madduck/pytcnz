@@ -339,25 +339,35 @@ class iSquashController:
                 to_register.append(player)
                 continue
             elif update:
-                self.driver.find_element(
+                edit_btn = self.driver.find_element(
                     By.XPATH,
                     "//*[@id='listRegistrantsForm']"
                     f"/table/tbody/tr[{rowx}]/td[7]"
                     "/input[@value='Edit']",
-                ).click()
+                )
+                edit_btn.click()
+                wait = WebDriverWait(self.driver, 10)
+                try:
+                    wait.until(
+                        expected_conditions.presence_of_element_located(
+                            (By.ID, "makeTournamentRegistration")
+                        )
+                    )
+                except Exception:
+                    import ipdb; ipdb.set_trace()  # noqa:E402,E702
                 try:
                     comments = player.comments
                 except AttributeError:
                     pass
                 else:
                     el = self.driver.find_element(
-                        By.ID, "makeTournamentRegistration:" "comment"
+                        By.ID, "makeTournamentRegistration:comment"
                     )
                     el.clear()
                     el.send_keys(comments)
 
                 self.driver.find_element(
-                    By.ID, "makeTournamentRegistration:" "enterTournament"
+                    By.ID, "makeTournamentRegistration:enterTournament"
                 ).click()
 
             wait = WebDriverWait(self.driver, 10)
