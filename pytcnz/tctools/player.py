@@ -59,8 +59,12 @@ class Player(BasePlayer):
         )
 
     def __repr__(self):
-        r = super().__repr__()
-        return r.replace(")>", ", waitlisted)>") if self.wl else r
+        r = super().__repr__()[:-2]
+        if self.wl:
+            r = f"{r}, waitlisted"
+        if not self.available:
+            r = f"{r}, unavailable"
+        return f"{r})>"
 
 
 if __name__ == "__main__":
