@@ -42,6 +42,7 @@ class TCExportReader(DataSource):
             **kwargs,
         )
 
+
     def __open_book(self, filename):
         self.__filename = filename
         try:

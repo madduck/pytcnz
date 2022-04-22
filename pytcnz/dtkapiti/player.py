@@ -4,10 +4,11 @@
 # Released under the MIT Licence
 #
 
+import re
+
 from ..datarecord import Placeholder
 from ..phonenumber import PhoneNumber
 from ..squashnz.player import Player as BasePlayer
-import re
 
 
 class Player(BasePlayer):

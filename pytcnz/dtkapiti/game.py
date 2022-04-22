@@ -4,15 +4,16 @@
 # Released under the MIT Licence
 #
 
+import dateutil.parser
+import enum
+import re
+
 from ..game import Game as BaseGame
 from ..squashnz.game_names import get_game_name
 from ..datarecord import Placeholder
 from ..exceptions import BaseException
 from ..scores import Scores
 from ..warnings import Warnings
-import re
-import enum
-import dateutil.parser
 
 
 class Game(BaseGame):
