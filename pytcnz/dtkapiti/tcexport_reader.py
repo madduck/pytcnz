@@ -71,7 +71,9 @@ class TCExportReader(DataSource):
             **kwargs,
         )
 
-    def read_players(self, *, colmap=None, resolve_duplicate_cb=None, **kwargs):
+    def read_players(
+        self, *, colmap=None, resolve_duplicate_cb=None, **kwargs
+    ):
         postprocess = None
         if self.__add_players_to_draws:
             if not self.draws:
@@ -109,7 +111,14 @@ class TCExportReader(DataSource):
         for player in self.players.values():
             self.__add_player_to_draw(player)
 
-    def read_games(self, *, colmap=None, autoflip_scores=None, resolve_duplicate_cb=None, **kwargs):
+    def read_games(
+        self,
+        *,
+        colmap=None,
+        autoflip_scores=None,
+        resolve_duplicate_cb=None,
+        **kwargs,
+    ):
         preprocess, postprocess = None, None
 
         if self.__add_players_to_games:

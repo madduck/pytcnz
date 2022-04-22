@@ -60,7 +60,7 @@ class Player(BasePlayer):
         )
 
     def has_defaulted(self):
-        return self.get('default', 'N').upper() == 'Y'
+        return self.get("default", "N").upper() == "Y"
 
 
 if __name__ == "__main__":
@@ -69,6 +69,7 @@ if __name__ == "__main__":
     print(repr(player))
     try:
         import ipdb
+
         ipdb.set_trace()
     except ImportError:
         pass
