@@ -62,8 +62,11 @@ class Player(BasePlayer):
         r = super().__repr__()[:-2]
         if self.wl:
             r = f"{r}, waitlisted"
-        if not self.available:
-            r = f"{r}, unavailable"
+        try:
+            if not self.available:
+                r = f"{r}, unavailable"
+        except AttributeError:
+            pass
         return f"{r})>"
 
 
