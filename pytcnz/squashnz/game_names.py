@@ -12,8 +12,8 @@ GAME_NAMES_BY_DRAW_SIZE = {
     8: {
         "301": ("Championship Final", "Final"),
         "302": ("Special Plate Final", "Sp.Plate"),
-        "303": ("Special Plate Final", "Plate"),
-        "304": ("Special Plate Final", "Co.Plate"),
+        "303": ("Plate Final", "Plate"),
+        "304": ("Consolation Plate Final", "Co.Plate"),
     },
 }
 
