@@ -241,3 +241,8 @@ def test_iteration(valid_score):
 def test_flip_scores(valid_score):
     valid_score.flip_scores()
     assert valid_score == Scores.from_string("4-11 11-5 8-11 10-12")[0]
+
+
+def test_comma_used_as_delim(valid_score):
+    with pytest.raises(Scores.IncompleteError):
+        Scores.from_string("4/11, 4/11, 4,11")

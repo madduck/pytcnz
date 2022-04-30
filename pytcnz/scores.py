@@ -90,26 +90,34 @@ class Scores:
 
         cntA, cntB = 0, 0
         maxpar = 0
-        for i, (a, b) in enumerate(self._sets, 1):
-            if (
-                (a - b > 2 and a not in self._par)
-                or (a - b == 2 and a < min(self._par))
-                or (a - b == 1)
-                or (b - a == 1)
-                or (b - a > 2 and b not in self._par)
-                or (b - a == 2 and b < min(self._par))
-            ):
+
+        try:
+            for i, (a, b) in enumerate(self._sets, 1):
+                if (
+                    (a - b > 2 and a not in self._par)
+                    or (a - b == 2 and a < min(self._par))
+                    or (a - b == 1)
+                    or (b - a == 1)
+                    or (b - a > 2 and b not in self._par)
+                    or (b - a == 2 and b < min(self._par))
+                ):
+                    raise Scores.IncompleteError(
+                        f"{a}-{b} did not reach any PAR in {self.par} in set {i}"
+                    )
+
+                cntA += 1 if a > b else 0
+                cntB += 1 if b > a else 0
+
+                if a - b > 2:
+                    maxpar = a  # noqa:E271,E701
+                elif b - a > 2:
+                    maxpar = b  # noqa:E271,E701
+
+        except ValueError as e:
+            if "not enough values to unpack" in str(e):
                 raise Scores.IncompleteError(
-                    f"{a}-{b} did not reach any PAR in {self.par} in set {i}"
+                    f"Not a pair of scores for set {i}: {self._sets[i]}"
                 )
-
-            cntA += 1 if a > b else 0
-            cntB += 1 if b > a else 0
-
-            if a - b > 2:
-                maxpar = a  # noqa:E271,E701
-            elif b - a > 2:
-                maxpar = b  # noqa:E271,E701
 
         if cntA == cntB:
             raise Scores.IncompleteError(f"No winner at {cntA}-{cntB}")
