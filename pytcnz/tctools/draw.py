@@ -9,6 +9,9 @@ from ..exceptions import BaseException
 
 
 class Draw(BaseDraw):
+    class InvalidDataError(BaseDraw.InvalidDataError):
+        pass
+
     class InvalidPlayerError(BaseException):
         pass
 
@@ -28,7 +31,12 @@ class Draw(BaseDraw):
         if name[1] == "O":
             div = 0  # noqa:E701
         else:
-            div = int(name[1:])  # noqa:E701
+            try:
+                div = int(name[1:])  # noqa:E701
+            except ValueError:
+                raise Draw.InvalidDataError(
+                    f"Draw number cannot be parsed: {name}"
+                )
 
         if div == 0:
             desc = f"{desc} Open"  # noqa:E701

@@ -39,6 +39,11 @@ def test_auto_description_div1(draw_data):
     assert Draw(**draw_data | dict(name="W1")).description == "Women's Div 1"
 
 
+def test_invalid_draw_name(draw_data):
+    with pytest.raises(Draw.InvalidDataError):
+        assert Draw(**draw_data | dict(name="M5`"))
+
+
 def test_add_player(draw, player):
     draw.add_player(player)
 
