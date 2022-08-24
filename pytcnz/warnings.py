@@ -25,7 +25,7 @@ class Warning:
         )
         r = f"{r}{self.__details}"
         if self.__additional:
-            r = f"{r} ({additional})"
+            r = f"{r} ({self.__additional})"
         return r
 
     def __repr__(self):
