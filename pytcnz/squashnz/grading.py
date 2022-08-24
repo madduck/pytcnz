@@ -85,6 +85,7 @@ class SquashNZGrading:
             raise InvalidGenderError(
                 f"Not a valid gender for grading: {gender.name}"
             )
+
         for th in list(table):
             if th != table.Ungraded and points >= th:
                 return th
@@ -97,6 +98,11 @@ class SquashNZGrading:
                 elif points == th:
                     # Ungraded gendered players must be 0…
                     return th
+
+                elif points > 0 and not junior:
+                    # A junior turning senior gets F grade even if below F
+                    # grade points
+                    return table.F
 
         raise SquashNZGrading.InvalidGradingError(
             f"No grade for {points} points"

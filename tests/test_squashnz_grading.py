@@ -18,12 +18,14 @@ from pytcnz.squashnz.grading import SquashNZGrading
         ("W", True, 250, "J3"),
         ("W", False, 0, "Ungraded"),
         ("W", True, 0, "Ungraded"),
+        ("M", False, 100, "F"),
         ("M", False, 4500, "A1"),
         ("M", False, 2980, "B2"),
         ("M", False, 1430, "E1"),
         ("M", False, 690, "F"),
         ("M", True, 690, "J2"),
         ("M", True, 250, "J4"),
+        ("M", False, 500, "F"),
         ("M", False, 0, "Ungraded"),
         ("M", True, 0, "Ungraded"),
         ("N", False, 0, "Ungraded"),
@@ -88,11 +90,9 @@ def test_sort_order_different_genders(lower_grading, grading):
 @pytest.fixture(
     params=[
         ("W", False, -1),
-        ("W", False, 100),
         ("W", True, -1),
         ("W", True, 1),
         ("M", False, -1),
-        ("M", False, 500),
         ("M", True, -1),
         ("M", True, 50),
     ]
