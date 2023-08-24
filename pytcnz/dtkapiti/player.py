@@ -12,6 +12,10 @@ from ..squashnz.player import Player as BasePlayer
 
 
 class Player(BasePlayer):
+
+    class DrawPatternError(BaseException):
+        pass
+
     def __init__(
         self,
         id,
@@ -28,7 +32,13 @@ class Player(BasePlayer):
         draw_name, seed = None, None
         if id is not None and len(id):
             pat = re.compile(rf"(?P<draw>{drawnamepat})(?P<seed>\d+)")
-            md = re.match(pat, id).groupdict()
+            m = re.match(pat, id)
+            if not m:
+                raise Player.DrawPatternError(
+                    f"Cannot deduce draw/seed from player ID {id}. "
+                    f"Maybe the pattern is wrong: {drawnamepat}"
+                )
+            md = m.groupdict()
             draw_name = md.get("draw")
             seed = int(md.get("seed"))
 

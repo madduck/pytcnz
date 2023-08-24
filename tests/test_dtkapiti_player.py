@@ -62,6 +62,14 @@ def test_parse_big_draw(player_data):
     assert p.seed == seed
 
 
+def test_parse_pattern_too_big(player_data):
+    draw = "M0"
+    seed = 4
+    _id = f"{draw}{seed}"
+    with pytest.raises(Player.DrawPatternError):
+        p = Player(drawnamepat=r"\w\d{2}", **player_data | dict(id=_id))
+
+
 @pytest.fixture(params=["id", "gender", "points", "dob", "phone", "mobile"])
 def attr_to_check(request):
     return request.param
