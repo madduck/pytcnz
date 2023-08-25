@@ -78,23 +78,14 @@ class iSquashController:
         pass
 
     @classmethod
-    def __get_firefox_driver(cls, *, headless=False, service_log_path=None):
-        profile = webdriver.FirefoxProfile()
+    def __get_firefox_driver(cls, *, headless=False):
         options = webdriver.FirefoxOptions()
         options.headless = headless
-        return webdriver.Firefox(
-            firefox_profile=profile,
-            options=options,
-            service_log_path=service_log_path or os.path.devnull,
-        )
+        return webdriver.Firefox(options=options)
 
-    def __init__(
-        self, *, headless=False, service_log_path=None, pagewait=5, debug=False
-    ):
+    def __init__(self, *, headless=False, pagewait=5, debug=False):
         self.state = self.State.init
-        self.driver = iSquashController.__get_firefox_driver(
-            headless=headless, service_log_path=service_log_path
-        )
+        self.driver = iSquashController.__get_firefox_driver(headless=headless)
         self.state = self.State.ready
         self.driver.implicitly_wait(pagewait)
         self.soup = None
@@ -354,7 +345,9 @@ class iSquashController:
                         )
                     )
                 except Exception:
-                    import ipdb; ipdb.set_trace()  # noqa:E402,E702
+                    import ipdb
+
+                    ipdb.set_trace()  # noqa:E402,E702
                 try:
                     comments = player.comments
                 except AttributeError:
@@ -479,7 +472,8 @@ class iSquashController:
         )
         if add_btn.get_property("disabled"):
             msg = self.driver.find_element(
-                By.XPATH, "//*//*[contains(@class, 'ui-messages')]/div/ul/li/span"
+                By.XPATH,
+                "//*//*[contains(@class, 'ui-messages')]/div/ul/li/span",
             )
             if player_cb:
                 player_cb(player, added=False, error=True, msg=msg.text)
@@ -533,10 +527,9 @@ class iSquashController:
 
         btn = self.driver.find_element(
             By.XPATH,
-            '//*[@id="toolbarForm"]/div/div[2]'
-            f'/input[@value="{btnlabel}"]',
+            '//*[@id="toolbarForm"]/div/div[2]' f'/input[@value="{btnlabel}"]',
         )
-        btndict = { btn.get_attribute("name") : btnlabel }
+        btndict = {btn.get_attribute("name"): btnlabel}
 
         response = requests.post(
             urljoin(self.driver.current_url, form.get_attribute("action")),
@@ -554,14 +547,10 @@ class iSquashController:
                     f.write(chunk)
 
     def go_extract_registrations(self, filename):
-        self._go_extract_spreadsheet(
-            filename, "Extract Registrations"
-        )
+        self._go_extract_spreadsheet(filename, "Extract Registrations")
 
     def go_extract_draws(self, filename):
-        self._go_extract_spreadsheet(
-            filename, "Extract Draws"
-        )
+        self._go_extract_spreadsheet(filename, "Extract Draws")
 
     def go_delete_draws(self, draws=None, *, draw_cb=None):
         self.go_design_tournament()
@@ -774,7 +763,9 @@ class iSquashController:
             except iSquashController.PlayerNameMismatchError as e:
                 Warnings.add(e, context=f"Entering results for {game.name}")
                 failed.append(game)
-                print(f"    fail: {game!r} Name mismatch: {e}", file=sys.stderr)
+                print(
+                    f"    fail: {game!r} Name mismatch: {e}", file=sys.stderr
+                )
                 continue
 
             played = self.driver.find_element(
@@ -783,7 +774,9 @@ class iSquashController:
             )
             if reset:
                 Select(played).select_by_value("Played")
-                scores = [(0, 0),] * 5
+                scores = [
+                    (0, 0),
+                ] * 5
 
             else:
                 if game.is_played():
@@ -794,9 +787,13 @@ class iSquashController:
                 if game.scores:
                     scores = list(game.scores)
                 elif game.get_winner() == game.players[0]:
-                    scores = [(11, 0),] * 3
+                    scores = [
+                        (11, 0),
+                    ] * 3
                 else:
-                    scores = [(0, 11),] * 3
+                    scores = [
+                        (0, 11),
+                    ] * 3
 
             if scores:
                 if reset:
@@ -853,7 +850,6 @@ class iSquashController:
 
 
 def make_argument_parser(add_help=False, *, configfile=None, **kwargs):
-
     argparser = argparse.ArgumentParser(add_help=add_help, **kwargs)
     defaults = {}
     if configfile:

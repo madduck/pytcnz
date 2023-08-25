@@ -33,7 +33,7 @@ setuptools.setup(
         "pyexcel-xls",
         "pyexcel-ods",
         "beautifulsoup4",
-        "selenium",
+        "selenium > 4.10",
         "phonenumbers",
         "python-dateutil",
         "requests",
