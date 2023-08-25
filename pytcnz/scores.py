@@ -136,6 +136,9 @@ class Scores:
                 raise Scores.IncompleteError(
                     f"{a}-{b} did not reach PAR {maxpar} in set {i}"
                 )
+            # TODO: If a player defaults, ideally we can keep the final score
+            # (which is the rules), but right now, Scores does not have the
+            # concept of defaults, and raises this error instead.
 
         self._winner = Scores.Player.A if cntA > cntB else Scores.Player.B
         self._games_score = (cntA, cntB)

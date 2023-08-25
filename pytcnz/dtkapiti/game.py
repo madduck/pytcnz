@@ -172,9 +172,10 @@ class Game(BaseGame):
                             )
 
             except Scores.IncompleteError as e:
-                raise Game.InconsistentResultError(
-                    f"Error parsing scores for game {name}: {e}"
-                )
+                if not player1.has_defaulted() and not player2.has_defaulted():
+                    raise Game.InconsistentResultError(
+                        f"Error parsing scores for game {name}: {e}"
+                    )
 
         data |= dict(
             scores=scores,
