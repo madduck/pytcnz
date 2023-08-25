@@ -11,6 +11,7 @@ from ..warnings import Warnings
 from ..util import get_timestamp
 from ..scores import Scores
 from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.select import Select
@@ -78,14 +79,11 @@ class iSquashController:
         pass
 
     @classmethod
-    def __get_firefox_driver(cls, *, headless=False, service_log_path=None):
-        profile = webdriver.FirefoxProfile()
-        options = webdriver.FirefoxOptions()
+    def __get_firefox_driver(cls, *, headless=False):
+        options = Options()
         options.headless = headless
         return webdriver.Firefox(
-            firefox_profile=profile,
-            options=options,
-            service_log_path=service_log_path or os.path.devnull,
+            options=options
         )
 
     def __init__(
@@ -93,7 +91,7 @@ class iSquashController:
     ):
         self.state = self.State.init
         self.driver = iSquashController.__get_firefox_driver(
-            headless=headless, service_log_path=service_log_path
+            headless=headless
         )
         self.state = self.State.ready
         self.driver.implicitly_wait(pagewait)
